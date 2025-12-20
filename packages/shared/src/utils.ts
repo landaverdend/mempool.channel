@@ -9,16 +9,14 @@ export function createMessage(type: MessageType, payload: unknown): Message {
   };
 }
 
-export function parseMessage(data: string): Message | null {
-  try {
-    const parsed = JSON.parse(data);
-    if (isValidMessage(parsed)) {
-      return parsed;
-    }
-    return null;
-  } catch {
-    return null;
+export function parseMessage(data: string): Message {
+
+  const parsed = JSON.parse(data);
+  if (isValidMessage(parsed)) {
+    return parsed;
   }
+
+  throw new Error('Invalid message');
 }
 
 export function serializeMessage(message: Message): string {
@@ -39,6 +37,8 @@ const VALID_MESSAGE_TYPES = [
   'join-room',
   'leave-room',
   'close-room',
+  'make-request',
+  'invoice-generated',
   'room-message',
   'room-created',
   'room-joined',

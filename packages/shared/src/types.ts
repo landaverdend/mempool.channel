@@ -11,6 +11,11 @@ export type MessageType =
   | 'subscribe'
   | 'unsubscribe'
   | 'data'
+
+  // Invoice Messages
+  | 'invoice-generated'
+  | 'make-request'
+
   // Room message types
   | 'create-room'
   | 'join-room'

@@ -12,6 +12,7 @@ import {
   UserLeftPayload,
   RoomMessageReceivedPayload,
   CreateRoomPayload,
+  MakeRequestPayload,
 } from '@mempool/shared';
 
 // Types
@@ -48,6 +49,7 @@ interface WebSocketContextValue {
 
   // Room actions
   createRoom: (payload: CreateRoomPayload) => void;
+  makeRequest: (payload: MakeRequestPayload) => void;
   joinRoom: (roomCode: string) => void;
   leaveRoom: () => void;
   closeRoom: () => void;
@@ -227,6 +229,13 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     sendMessage('ping', { time: Date.now() });
   }, [sendMessage]);
 
+  const makeRequest = useCallback(
+    (requestPayload: MakeRequestPayload) => {
+      sendMessage('make-request', requestPayload);
+    },
+    [sendMessage]
+  );
+
   const createRoom = useCallback(
     (createRoomPayload: CreateRoomPayload) => {
       sendMessage('create-room', createRoomPayload);
@@ -291,6 +300,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     createRoom,
     joinRoom,
     leaveRoom,
+    makeRequest,
     closeRoom,
     sendRoomMessage,
     clearError,

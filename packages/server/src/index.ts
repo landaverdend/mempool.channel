@@ -17,8 +17,9 @@ import {
   RoomJoinedPayload,
   RoomCreatedPayload,
   LnParams,
+  MakeRequestPayload,
 } from '@mempool/shared';
-import { getLNParams } from './utils.js';
+import { getInvoice, getLNParams } from './utils.js';
 
 const PORT = 8080;
 
@@ -93,6 +94,10 @@ wss.on('connection', (ws: WebSocket) => {
         handleRoomMessage(extWs, message.payload as RoomMessagePayload);
         break;
 
+      case 'make-request':
+        handleMakeRequest(extWs, message.payload as MakeRequestPayload);
+        break;
+
       default:
         console.log(`Unhandled message type: ${message.type}`);
     }
@@ -162,7 +167,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     members: [ws.clientId],
     createdAt: Date.now(),
     hostLightningAddress: payload.lightningAddress,
-    lnParams: lnParams
+    lnParams: lnParams,
   };
 
   rooms.set(roomCode, room);
@@ -286,6 +291,29 @@ function handleRoomMessage(ws: ExtendedWebSocket, payload: RoomMessagePayload): 
       memberWs.send(serializeMessage(message));
     }
   });
+}
+
+async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayload): Promise<void> {
+  const roomCode = normalizeRoomCode(payload.roomCode || '');
+
+  const currentRoom = clientRooms.get(ws.clientId);
+  if (!currentRoom || currentRoom !== roomCode) {
+    sendError(ws, 'not_in_room', 'You are not in this room.', roomCode);
+    return;
+  }
+
+  const room = rooms.get(roomCode);
+  if (!room) {
+    sendError(ws, 'room_not_found', 'Room not found.', roomCode);
+    return;
+  }
+
+  const invoice = await getInvoice(room.lnParams, payload.amount, payload.url);
+
+  const response = createMessage('invoice-generated', {
+    invoice,
+  });
+  ws.send(serializeMessage(response));
 }
 
 function handleDisconnect(ws: ExtendedWebSocket): void {

@@ -18,6 +18,7 @@ function App() {
     joinRoom,
     leaveRoom,
     closeRoom,
+    makeRequest,
     sendRoomMessage,
     clearError,
   } = useWebSocket();
@@ -54,6 +55,22 @@ function App() {
     }
 
     createRoom({ lightningAddress });
+  };
+
+  const handleMakeRequest = () => {
+    if (!roomState.roomCode) {
+      alert('Not in a room');
+      return;
+    }
+
+    const amount = prompt('Enter amount (in sats):');
+    const url = prompt('Enter URL/Message:');
+    if (!amount || !url) {
+      alert('Invalid amount or URL');
+      return;
+    }
+
+    makeRequest({ roomCode: roomState.roomCode, amount: Number(amount), url });
   };
 
   return (
@@ -161,6 +178,11 @@ function App() {
                     Leave Room
                   </button>
                 )}
+                <button
+                  onClick={handleMakeRequest}
+                  className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors">
+                  Make Request
+                </button>
               </div>
             </div>
             <p className="text-gray-400 mb-3">Members: {roomState.members.length}</p>
