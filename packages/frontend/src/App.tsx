@@ -1,241 +1,48 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  createMessage,
-  parseMessage,
-  serializeMessage,
-  Message,
-  RoomCreatedPayload,
-  RoomJoinedPayload,
-  RoomClosedPayload,
-  RoomErrorPayload,
-  UserJoinedPayload,
-  UserLeftPayload,
-  RoomMessageReceivedPayload,
-} from '@mempool/shared';
+import { useState } from 'react';
+import { useWebSocket } from './contexts/websocket-context';
 import MessageDebug from './components/message-debug';
 
-interface RoomState {
-  roomCode: string | null;
-  isHost: boolean;
-  members: string[];
-}
-
-interface RoomMessage {
-  id: string;
-  senderId: string;
-  content: unknown;
-  isHost: boolean;
-  timestamp: number;
-}
-
 function App() {
-  const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [clientId, setClientId] = useState<string | null>(null);
+  const {
+    connected,
+    clientId,
+    messages,
+    error,
+    roomState,
+    roomMessages,
+    connect,
+    disconnect,
+    sendPing,
+    createRoom,
+    joinRoom,
+    leaveRoom,
+    closeRoom,
+    sendRoomMessage,
+    clearError,
+  } = useWebSocket();
 
-  // Room state
-  const [roomState, setRoomState] = useState<RoomState>({
-    roomCode: null,
-    isHost: false,
-    members: [],
-  });
-  const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
   const [joinCode, setJoinCode] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
 
-  const connect = useCallback(() => {
-    const socket = new WebSocket('ws://localhost:8080');
-
-    socket.onopen = () => {
-      setConnected(true);
-      console.log('Connected to server');
-    };
-
-    socket.onmessage = (event) => {
-      const message = parseMessage(event.data);
-      if (!message) return;
-
-      setMessages((prev) => [...prev, message]);
-
-      // Handle room-specific messages
-      switch (message.type) {
-        case 'data': {
-          const dataPayload = message.payload as { clientId?: string };
-          if (dataPayload.clientId) {
-            setClientId(dataPayload.clientId);
-          }
-          break;
-        }
-
-        case 'room-created': {
-          const payload = message.payload as RoomCreatedPayload;
-          setRoomState({
-            roomCode: payload.roomCode,
-            isHost: true,
-            members: [clientId || ''],
-          });
-          setRoomMessages([]);
-          setError(null);
-          break;
-        }
-
-        case 'room-joined': {
-          const payload = message.payload as RoomJoinedPayload;
-          setRoomState({
-            roomCode: payload.roomCode,
-            isHost: payload.isHost,
-            members: payload.members,
-          });
-          setRoomMessages([]);
-          setError(null);
-          break;
-        }
-
-        case 'room-left': {
-          setRoomState({ roomCode: null, isHost: false, members: [] });
-          setRoomMessages([]);
-          break;
-        }
-
-        case 'room-closed': {
-          const payload = message.payload as RoomClosedPayload;
-          setRoomState({ roomCode: null, isHost: false, members: [] });
-          setRoomMessages([]);
-          const reasonText = payload.reason.replace(/_/g, ' ');
-          setError(`Room closed: ${reasonText}`);
-          break;
-        }
-
-        case 'user-joined': {
-          const payload = message.payload as UserJoinedPayload;
-          setRoomState((prev) => ({
-            ...prev,
-            members: [...prev.members, payload.clientId],
-          }));
-          break;
-        }
-
-        case 'user-left': {
-          const payload = message.payload as UserLeftPayload;
-          setRoomState((prev) => ({
-            ...prev,
-            members: prev.members.filter((id) => id !== payload.clientId),
-          }));
-          break;
-        }
-
-        case 'room-message': {
-          const payload = message.payload as RoomMessageReceivedPayload;
-          setRoomMessages((prev) => [
-            ...prev,
-            {
-              id: message.id,
-              senderId: payload.senderId,
-              content: payload.content,
-              isHost: payload.isHost,
-              timestamp: message.timestamp,
-            },
-          ]);
-          break;
-        }
-
-        case 'room-error': {
-          const payload = message.payload as RoomErrorPayload;
-          setError(payload.message);
-          break;
-        }
-      }
-    };
-
-    socket.onclose = () => {
-      setConnected(false);
-      setRoomState({ roomCode: null, isHost: false, members: [] });
-      setRoomMessages([]);
-      console.log('Disconnected from server');
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    setWs(socket);
-  }, [clientId]);
-
-  const disconnect = useCallback(() => {
-    if (ws) {
-      ws.close();
-      setWs(null);
-    }
-  }, [ws]);
-
-  const sendPing = useCallback(() => {
-    if (ws && connected) {
-      const message = createMessage('ping', { time: Date.now() });
-      ws.send(serializeMessage(message));
-    }
-  }, [ws, connected]);
-
-  const createRoom = useCallback(() => {
-    if (ws && connected) {
-      const message = createMessage('create-room', {});
-      ws.send(serializeMessage(message));
-    }
-  }, [ws, connected]);
-
-  const joinRoom = useCallback(() => {
-    if (ws && connected && joinCode.trim()) {
-      const message = createMessage('join-room', {
-        roomCode: joinCode.trim().toUpperCase(),
-      });
-      ws.send(serializeMessage(message));
+  const handleJoinRoom = () => {
+    if (joinCode.trim()) {
+      joinRoom(joinCode);
       setJoinCode('');
     }
-  }, [ws, connected, joinCode]);
+  };
 
-  const leaveRoom = useCallback(() => {
-    if (ws && connected && roomState.roomCode) {
-      const message = createMessage('leave-room', {
-        roomCode: roomState.roomCode,
-      });
-      ws.send(serializeMessage(message));
-    }
-  }, [ws, connected, roomState.roomCode]);
-
-  const closeRoom = useCallback(() => {
-    if (ws && connected && roomState.roomCode && roomState.isHost) {
-      const message = createMessage('close-room', {
-        roomCode: roomState.roomCode,
-      });
-      ws.send(serializeMessage(message));
-    }
-  }, [ws, connected, roomState.roomCode, roomState.isHost]);
-
-  const sendRoomMessage = useCallback(() => {
-    if (ws && connected && roomState.roomCode && messageInput.trim()) {
-      const message = createMessage('room-message', {
-        roomCode: roomState.roomCode,
-        content: messageInput.trim(),
-      });
-      ws.send(serializeMessage(message));
+  const handleSendMessage = () => {
+    if (messageInput.trim()) {
+      sendRoomMessage(messageInput);
       setMessageInput('');
     }
-  }, [ws, connected, roomState.roomCode, messageInput]);
+  };
 
-  const copyRoomCode = useCallback(() => {
+  const copyRoomCode = () => {
     if (roomState.roomCode) {
       navigator.clipboard.writeText(roomState.roomCode);
     }
-  }, [roomState.roomCode]);
-
-  useEffect(() => {
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, [ws]);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-gray-100 font-sans">
@@ -276,7 +83,7 @@ function App() {
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 flex justify-between items-center">
             <span>{error}</span>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200 ml-2">
+            <button onClick={clearError} className="text-red-400 hover:text-red-200 ml-2">
               [dismiss]
             </button>
           </div>
@@ -301,10 +108,10 @@ function App() {
                 placeholder="Enter room code"
                 maxLength={6}
                 className="px-3 py-2 bg-slate-700 text-gray-100 rounded border border-slate-600 focus:border-indigo-500 focus:outline-none uppercase tracking-wider font-mono"
-                onKeyDown={(e) => e.key === 'Enter' && joinRoom()}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom()}
               />
               <button
-                onClick={joinRoom}
+                onClick={handleJoinRoom}
                 disabled={!joinCode.trim()}
                 className="px-4 py-2 bg-indigo-700 text-gray-100 rounded cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 Join Room
@@ -371,10 +178,10 @@ function App() {
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Type a message..."
                   className="flex-1 px-3 py-2 bg-slate-600 text-gray-100 rounded border border-slate-500 focus:border-indigo-500 focus:outline-none"
-                  onKeyDown={(e) => e.key === 'Enter' && sendRoomMessage()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
                 <button
-                  onClick={sendRoomMessage}
+                  onClick={handleSendMessage}
                   disabled={!messageInput.trim()}
                   className="px-4 py-2 bg-indigo-700 text-gray-100 rounded cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   Send
