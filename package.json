@@ -1,0 +1,13 @@
+{
+  "name": "mempool-band-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:server": "pnpm --filter server dev",
+    "dev": "pnpm run dev:frontend & pnpm run dev:server"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
