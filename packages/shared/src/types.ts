@@ -41,6 +41,8 @@ export interface Room {
   hostId: string;
   members: string[];
   createdAt: number;
+
+  hostLightningAddress: string;
 }
 
 // Room request payloads
@@ -69,12 +71,14 @@ export interface CreateRoomPayload {
 export interface RoomCreatedPayload {
   roomCode: string;
   isHost: true;
+  hostLightningAddress: string;
 }
 
 export interface RoomJoinedPayload {
   roomCode: string;
   isHost: boolean;
   members: string[];
+  hostLightningAddress: string;
 }
 
 export interface RoomLeftPayload {

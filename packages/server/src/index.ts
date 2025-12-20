@@ -14,6 +14,8 @@ import {
   RoomMessagePayload,
   RoomErrorType,
   CreateRoomPayload,
+  RoomJoinedPayload,
+  RoomCreatedPayload,
 } from '@mempool/shared';
 
 const PORT = 8080;
@@ -136,8 +138,6 @@ function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): vo
     return;
   }
 
-  // TODO: Validate that the lightning address exists?
-
   // Generate unique room code
   let roomCode: string;
   do {
@@ -150,6 +150,7 @@ function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): vo
     hostId: ws.clientId,
     members: [ws.clientId],
     createdAt: Date.now(),
+    hostLightningAddress: payload.lightningAddress,
   };
 
   rooms.set(roomCode, room);
@@ -161,7 +162,8 @@ function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): vo
   const response = createMessage('room-created', {
     roomCode,
     isHost: true,
-  });
+    hostLightningAddress: payload.lightningAddress,
+  } as RoomCreatedPayload);
   ws.send(serializeMessage(response));
 }
 
@@ -198,7 +200,8 @@ function handleJoinRoom(ws: ExtendedWebSocket, payload: JoinRoomPayload): void {
     roomCode,
     isHost: room.hostId === ws.clientId,
     members: room.members,
-  });
+    hostLightningAddress: room.hostLightningAddress,
+  } as RoomJoinedPayload);
   ws.send(serializeMessage(joinResponse));
 
   // Notify other room members

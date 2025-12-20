@@ -145,6 +145,7 @@ function App() {
                   {roomState.roomCode}
                 </span>
                 {roomState.isHost && <span className="text-sm bg-yellow-600 px-2 py-1 rounded font-normal">HOST</span>}
+                <span className="text-sm text-gray-400">{roomState.hostLightningAddress}</span>
               </h2>
               <div className="flex gap-2">
                 {roomState.isHost ? (
