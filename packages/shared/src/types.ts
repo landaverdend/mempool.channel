@@ -96,7 +96,7 @@ export interface RoomErrorPayload {
   roomCode?: string;
 }
 
-export type RoomErrorType = 'room_not_found' | 'already_in_room' | 'not_in_room' | 'not_host' | 'invalid_code';
+export type RoomErrorType = 'room_not_found' | 'already_in_room' | 'not_in_room' | 'not_host' | 'invalid_code' | 'invalid_lightning_address';
 
 export interface UserJoinedPayload {
   roomCode: string;

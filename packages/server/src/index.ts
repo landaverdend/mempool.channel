@@ -17,6 +17,7 @@ import {
   RoomJoinedPayload,
   RoomCreatedPayload,
 } from '@mempool/shared';
+import { checkLightningAddressResolvable } from './utils.js';
 
 const PORT = 8080;
 
@@ -131,10 +132,16 @@ function handleUnsubscribe(ws: ExtendedWebSocket, payload: { channel: string }):
 }
 
 // Room handlers
-function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): void {
+async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): Promise<void> {
   // Check if client is already in a room
   if (clientRooms.has(ws.clientId)) {
     sendError(ws, 'already_in_room', 'You are already in a room. Leave first.');
+    return;
+  }
+
+  const isResolvable = await checkLightningAddressResolvable(payload.lightningAddress);
+  if (!isResolvable) {
+    sendError(ws, 'invalid_lightning_address', 'Invalid lightning address');
     return;
   }
 
