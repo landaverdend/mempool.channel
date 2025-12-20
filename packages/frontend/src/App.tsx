@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWebSocket } from './contexts/websocket-context';
 import MessageDebug from './components/message-debug';
+import { isValidLightningAddress } from './lib/utils';
 
 function App() {
   const {
@@ -47,7 +48,10 @@ function App() {
   const handleCreateRoom = () => {
     const lightningAddress = prompt('Enter lightning address to send to:');
 
-    if (!lightningAddress) return;
+    if (!lightningAddress || !isValidLightningAddress(lightningAddress)) {
+      alert('Invalid lightning address');
+      return;
+    }
 
     createRoom({ lightningAddress });
   };
