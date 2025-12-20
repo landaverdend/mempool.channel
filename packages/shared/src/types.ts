@@ -6,12 +6,25 @@ export interface Message {
 }
 
 export type MessageType =
-  | 'ping' | 'pong' | 'subscribe' | 'unsubscribe' | 'data'
+  | 'ping'
+  | 'pong'
+  | 'subscribe'
+  | 'unsubscribe'
+  | 'data'
   // Room message types
-  | 'create-room' | 'join-room' | 'leave-room' | 'close-room' | 'room-message'
+  | 'create-room'
+  | 'join-room'
+  | 'leave-room'
+  | 'close-room'
+  | 'room-message'
   // Room response types
-  | 'room-created' | 'room-joined' | 'room-left' | 'room-closed'
-  | 'room-error' | 'user-joined' | 'user-left';
+  | 'room-created'
+  | 'room-joined'
+  | 'room-left'
+  | 'room-closed'
+  | 'room-error'
+  | 'user-joined'
+  | 'user-left';
 
 export interface SubscribePayload {
   channel: string;
@@ -75,12 +88,7 @@ export interface RoomErrorPayload {
   roomCode?: string;
 }
 
-export type RoomErrorType =
-  | 'room_not_found'
-  | 'already_in_room'
-  | 'not_in_room'
-  | 'not_host'
-  | 'invalid_code';
+export type RoomErrorType = 'room_not_found' | 'already_in_room' | 'not_in_room' | 'not_host' | 'invalid_code';
 
 export interface UserJoinedPayload {
   roomCode: string;
