@@ -11,6 +11,7 @@ import {
   UserJoinedPayload,
   UserLeftPayload,
   RoomMessageReceivedPayload,
+  CreateRoomPayload,
 } from '@mempool/shared';
 
 // Types
@@ -27,6 +28,7 @@ export interface RoomMessage {
   isHost: boolean;
   timestamp: number;
 }
+
 
 interface WebSocketContextValue {
   // Connection state
@@ -45,7 +47,7 @@ interface WebSocketContextValue {
   sendPing: () => void;
 
   // Room actions
-  createRoom: () => void;
+  createRoom: (payload: CreateRoomPayload) => void;
   joinRoom: (roomCode: string) => void;
   leaveRoom: () => void;
   closeRoom: () => void;

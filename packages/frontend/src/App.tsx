@@ -44,6 +44,14 @@ function App() {
     }
   };
 
+  const handleCreateRoom = () => {
+    const lightningAddress = prompt('Enter lightning address to send to:');
+
+    if (!lightningAddress) return;
+
+    createRoom({ lightningAddress });
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-gray-100 font-sans">
       <div className="max-w-3xl mx-auto p-8">
@@ -95,7 +103,7 @@ function App() {
             <h2 className="text-xl font-semibold mb-3">Room Controls</h2>
             <div className="flex gap-2 mb-3">
               <button
-                onClick={createRoom}
+                onClick={handleCreateRoom}
                 className="px-4 py-2 bg-green-700 text-gray-100 rounded cursor-pointer hover:bg-green-600 transition-colors">
                 Create Room
               </button>

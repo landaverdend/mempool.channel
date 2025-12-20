@@ -61,6 +61,10 @@ export interface RoomMessagePayload {
   content: unknown;
 }
 
+export interface CreateRoomPayload {
+  lightningAddress: string;
+}
+
 // Room response payloads
 export interface RoomCreatedPayload {
   roomCode: string;

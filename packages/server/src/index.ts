@@ -13,6 +13,7 @@ import {
   CloseRoomPayload,
   RoomMessagePayload,
   RoomErrorType,
+  CreateRoomPayload,
 } from '@mempool/shared';
 
 const PORT = 8080;
@@ -69,7 +70,7 @@ wss.on('connection', (ws: WebSocket) => {
         break;
 
       case 'create-room':
-        handleCreateRoom(extWs);
+        handleCreateRoom(extWs, message.payload as CreateRoomPayload);
         break;
 
       case 'join-room':
@@ -128,12 +129,14 @@ function handleUnsubscribe(ws: ExtendedWebSocket, payload: { channel: string }):
 }
 
 // Room handlers
-function handleCreateRoom(ws: ExtendedWebSocket): void {
+function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): void {
   // Check if client is already in a room
   if (clientRooms.has(ws.clientId)) {
     sendError(ws, 'already_in_room', 'You are already in a room. Leave first.');
     return;
   }
+
+  // TODO: Validate that the lightning address exists?
 
   // Generate unique room code
   let roomCode: string;
@@ -199,10 +202,15 @@ function handleJoinRoom(ws: ExtendedWebSocket, payload: JoinRoomPayload): void {
   ws.send(serializeMessage(joinResponse));
 
   // Notify other room members
-  broadcastToRoom(roomCode, 'user-joined', {
+  broadcastToRoom(
     roomCode,
-    clientId: ws.clientId,
-  }, ws.clientId);
+    'user-joined',
+    {
+      roomCode,
+      clientId: ws.clientId,
+    },
+    ws.clientId
+  );
 }
 
 function handleLeaveRoom(ws: ExtendedWebSocket, payload: LeaveRoomPayload): void {
@@ -338,12 +346,7 @@ function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected'
   rooms.delete(roomCode);
 }
 
-function broadcastToRoom(
-  roomCode: string,
-  type: string,
-  payload: unknown,
-  excludeClientId?: string
-): void {
+function broadcastToRoom(roomCode: string, type: string, payload: unknown, excludeClientId?: string): void {
   const room = rooms.get(roomCode);
   if (!room) return;
 
@@ -359,12 +362,7 @@ function broadcastToRoom(
   });
 }
 
-function sendError(
-  ws: ExtendedWebSocket,
-  error: RoomErrorType,
-  message: string,
-  roomCode?: string
-): void {
+function sendError(ws: ExtendedWebSocket, error: RoomErrorType, message: string, roomCode?: string): void {
   const errorResponse = createMessage('room-error', {
     error,
     message,
