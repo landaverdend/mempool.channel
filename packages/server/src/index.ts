@@ -16,8 +16,9 @@ import {
   CreateRoomPayload,
   RoomJoinedPayload,
   RoomCreatedPayload,
+  LnParams,
 } from '@mempool/shared';
-import { checkLightningAddressResolvable } from './utils.js';
+import { getLNParams } from './utils.js';
 
 const PORT = 8080;
 
@@ -139,8 +140,11 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     return;
   }
 
-  const isResolvable = await checkLightningAddressResolvable(payload.lightningAddress);
-  if (!isResolvable) {
+  let lnParams: LnParams;
+  try {
+    lnParams = await getLNParams(payload.lightningAddress);
+    console.log(lnParams);
+  } catch (error) {
     sendError(ws, 'invalid_lightning_address', 'Invalid lightning address');
     return;
   }
@@ -158,6 +162,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     members: [ws.clientId],
     createdAt: Date.now(),
     hostLightningAddress: payload.lightningAddress,
+    lnParams: lnParams
   };
 
   rooms.set(roomCode, room);

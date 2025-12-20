@@ -43,6 +43,7 @@ export interface Room {
   createdAt: number;
 
   hostLightningAddress: string;
+  lnParams: LnParams; // We might not want to expose this to the client.
 }
 
 // Room request payloads
@@ -96,7 +97,13 @@ export interface RoomErrorPayload {
   roomCode?: string;
 }
 
-export type RoomErrorType = 'room_not_found' | 'already_in_room' | 'not_in_room' | 'not_host' | 'invalid_code' | 'invalid_lightning_address';
+export type RoomErrorType =
+  | 'room_not_found'
+  | 'already_in_room'
+  | 'not_in_room'
+  | 'not_host'
+  | 'invalid_code'
+  | 'invalid_lightning_address';
 
 export interface UserJoinedPayload {
   roomCode: string;
@@ -113,4 +120,14 @@ export interface RoomMessageReceivedPayload {
   senderId: string;
   content: unknown;
   isHost: boolean;
+}
+
+export interface LnParams {
+  callback: string; // The URL from LN SERVICE which will accept the pay request parameters
+  maxSendable: number; // Max amount LN SERVICE is willing to receive
+  minSendable: number; // Min amount LN SERVICE is willing to receive, can not be less than 1 or more than `maxSendable`
+  metadata: string; // Metadata json which must be presented as raw string here, this is required to pass signature verification at a later step
+  commentAllowed: number; // Optional number of characters accepted for the `comment` query parameter on subsequent callback, defaults to 0 if not provided. (no comment allowed)
+  withdrawLink: string; // Optional lnurl-withdraw link (for explanation see justification.md)
+  tag: 'payRequest'; // Type of LNURL
 }
