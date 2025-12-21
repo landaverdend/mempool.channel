@@ -14,7 +14,6 @@ import {
   RoomMessagePayload,
   RoomErrorType,
   CreateRoomPayload,
-  RoomJoinedPayload,
   RoomCreatedPayload,
   LnParams,
   MakeRequestPayload,
@@ -329,6 +328,7 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
       amount: payload.amount,
       lnUrl: invoice.pr,
       url: payload.url,
+      roomCode,
     });
 
     ws.send(serializeMessage(response));

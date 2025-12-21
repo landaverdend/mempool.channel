@@ -29,11 +29,7 @@ type InvoiceResponse = {
   routes: [];
 };
 
-export async function getInvoice(
-  lnParams: LnParams,
-  amountSats: number,
-  comment?: string
-): Promise<InvoiceResponse> {
+export async function getInvoice(lnParams: LnParams, amountSats: number, comment?: string): Promise<InvoiceResponse> {
   const { callback } = lnParams;
 
   // Convert sats to millisats (LNURL-pay uses millisats)

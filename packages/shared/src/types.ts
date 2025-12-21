@@ -48,6 +48,7 @@ export interface ServerRequest {
   amount: number;
   lnUrl: string; // LN URL to be used in invoice
   url: string;
+  roomCode: string;
 }
 export interface Room {
   code: string;
