@@ -14,7 +14,7 @@
   --color-bg-hover: #12131e;
   --color-bg-box: #171c2a;
   --color-bg-stat: #0b1018;
-  --color-bg-navbar: #212121;
+  --color-bg-nav: #11131f;
   --color-bg-alert: #3a1c61;
   --color-bg-skeleton: #2e324e;
   --color-bg-skeleton-light: #5d6182;
@@ -73,9 +73,7 @@
   --color-search-border: #472a6e;
   --color-search-focus: #533180;
 
-
   --block-size: 125px;
-
 
   /* Border */
   --color-border: #20263e;
@@ -119,9 +117,9 @@ pre,
 .block-3d::before {
   content: '';
   position: absolute;
-  top: calc(-.16 * var(--block-size));
+  top: calc(-0.16 * var(--block-size));
   width: calc(var(--block-size) + 1px);
-  height: calc(.16 * var(--block-size));
+  height: calc(0.16 * var(--block-size));
   background: #232838;
   transform: skewX(45deg);
   transform-origin: bottom left;
@@ -130,9 +128,9 @@ pre,
 .block-3d::after {
   content: '';
   position: absolute;
-  top: calc(-.16 * var(--block-size)); 
-  left: calc(-.16 * var(--block-size));
-  width: calc(.16 * 125px);
+  top: calc(-0.16 * var(--block-size));
+  left: calc(-0.16 * var(--block-size));
+  width: calc(0.16 * 125px);
   height: var(--block-size);
   background: #191c27;
   transform: skewY(45deg);

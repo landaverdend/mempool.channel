@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/websocket-context';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -81,15 +82,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
-      {/* Header */}
-      <header className="p-4 sm:p-6">
-        <div className="max-w-lg mx-auto">
-          <div className="flex flex-row sm:flex-col items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-bold text-fg">mempool</span>
-            <span className="text-2xl sm:text-3xl font-bold text-title-purple">.band</span>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center p-4">

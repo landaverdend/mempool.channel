@@ -85,14 +85,6 @@ export default function Room() {
           </div>
         )}
 
-        {/* Members */}
-        <div className="mb-4 p-3 bg-slate-800 rounded">
-          <p className="text-gray-400">
-            <span className="font-semibold">{roomState.members.length}</span> member
-            {roomState.members.length !== 1 && 's'} in room
-          </p>
-        </div>
-
         {/* Invoice Request */}
         <div className="mb-4 p-4 bg-slate-800 rounded">
           <div className="flex items-center justify-between">
