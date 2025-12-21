@@ -41,7 +41,6 @@ export interface DataPayload {
   data: unknown;
 }
 
-
 // Room request payloads
 export interface JoinRoomPayload {
   roomCode: string;
@@ -105,7 +104,8 @@ export type RoomErrorType =
   | 'not_in_room'
   | 'not_host'
   | 'invalid_code'
-  | 'invalid_nwc_uri';
+  | 'invalid_nwc_uri'
+  | 'invoice_error';
 
 export interface UserJoinedPayload {
   roomCode: string;
@@ -135,7 +135,8 @@ export interface MakeRequestPayload {
 export interface InvoiceGeneratedPayload {
   invoice: {
     pr: string; // BOLT11 payment request
-    routes: unknown[];
+    amount: number;
+    description?: string;
   };
 }
 

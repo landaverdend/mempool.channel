@@ -310,6 +310,27 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
     sendError(ws, 'room_not_found', 'Room not found.', roomCode);
     return;
   }
+
+  try {
+    const invoice = await room.nwcClient.makeInvoice({
+      amount: payload.amount,
+      description: payload.comment,
+    });
+
+    const invoiceResponse = createMessage('invoice-generated', {
+      invoice: {
+        pr: invoice.invoice,
+        amount: invoice.amount,
+        description: invoice.description,
+      },
+    });
+
+    ws.send(serializeMessage(invoiceResponse));
+  } catch (error) {
+    console.error('Error creating invoice: ', error);
+    sendError(ws, 'invoice_error', 'Failed to create invoice.', roomCode);
+    return;
+  }
 }
 
 function handleDisconnect(ws: ExtendedWebSocket): void {
