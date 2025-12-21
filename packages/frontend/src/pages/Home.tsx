@@ -103,7 +103,7 @@ export default function Home() {
 
           {/* Mode: Select */}
           {mode === 'select' && (
-            <div className="bg-bg-box border border-border rounded-lg p-6 sm:p-8">
+            <div className="bg-bg-card rounded-lg p-6 sm:p-8">
               <h1 className="text-xl sm:text-2xl font-semibold text-fg mb-2">
                 Welcome to mempool<span className="text-title-purple">.band</span>
               </h1>
