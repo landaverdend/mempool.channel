@@ -14,18 +14,8 @@ import {
   MakeRequestPayload,
   InvoiceGeneratedPayload,
   InvoiceErrorPayload,
+  ClientRoomInfo,
 } from '@mempool/shared';
-
-// Types
-export interface RoomState {
-  roomCode: string | null;
-  isHost: boolean;
-  members: string[];
-  hostLightningAddress: string;
-
-  minSendable: number;
-  maxSendable: number;
-}
 
 export interface RoomMessage {
   id: string;
@@ -41,13 +31,11 @@ export interface InvoiceState {
   error: string | null;
 }
 
-const EMPTY_ROOM_STATE: RoomState = {
-  roomCode: null,
+const EMPTY_ROOM_STATE: ClientRoomInfo = {
+  roomCode: '',
   isHost: false,
   members: [],
-  hostLightningAddress: '',
-  minSendable: 0,
-  maxSendable: 0,
+  settledRequests: [],
 };
 
 interface WebSocketContextValue {
@@ -58,7 +46,7 @@ interface WebSocketContextValue {
   error: string | null;
 
   // Room state
-  roomState: RoomState;
+  roomState: ClientRoomInfo;
   roomMessages: RoomMessage[];
 
   // Invoice state
@@ -92,7 +80,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [clientId, setClientId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [roomState, setRoomState] = useState<RoomState>(EMPTY_ROOM_STATE);
+  const [roomState, setRoomState] = useState<ClientRoomInfo>(EMPTY_ROOM_STATE);
   const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
   const [invoiceState, setInvoiceState] = useState<InvoiceState>({
     invoice: null,

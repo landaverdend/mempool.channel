@@ -1,4 +1,3 @@
-import { useWebSocket } from '@/contexts/websocket-context';
 import { useState } from 'react';
 
 interface InvoiceRequestModalProps {
@@ -9,38 +8,18 @@ interface InvoiceRequestModalProps {
 }
 
 export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoading }: InvoiceRequestModalProps) {
-  const { roomState } = useWebSocket();
-
-  const [amount, setAmount] = useState(roomState.minSendable.toString());
+  const [amount, setAmount] = useState('');
   const [comment, setComment] = useState('');
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const validateAmount = (amount: number) => {
-    if (amount < roomState.minSendable) {
-      setError(`Amount must be greater than ${roomState.minSendable} sats`);
-      return false;
-    }
-
-    if (amount > roomState.maxSendable) {
-      setError(`Amount must be less than ${roomState.maxSendable} sats`);
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = () => {
     const amountNum = parseInt(amount, 10);
 
     if (!amount || isNaN(amountNum) || amountNum <= 0) {
       setError('Please enter a valid amount');
-      return;
-    }
-
-    if (!validateAmount(amountNum)) {
       return;
     }
 
@@ -68,13 +47,10 @@ export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoadi
           <div>
             <label className="block text-sm text-gray-400 mb-1">
               Amount (sats) <span className="text-red-400">*</span>{' '}
-              <span className="text-gray-400 text-xs">({roomState.minSendable} sats minimum)</span>
             </label>
             <input
               type="number"
               value={amount}
-              min={roomState.minSendable.toString()}
-              max={roomState.maxSendable.toString()}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="21000"
               className="w-full px-4 py-3 bg-slate-700 text-gray-100 rounded-lg border border-slate-600 focus:border-indigo-500 focus:outline-none"

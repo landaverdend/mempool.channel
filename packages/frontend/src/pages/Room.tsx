@@ -106,7 +106,7 @@ export default function Room() {
               </span>
               {roomState.isHost && <span className="text-sm bg-yellow-600 px-2 py-1 rounded">HOST</span>}
             </h1>
-            <p className="text-gray-400 text-sm mt-1">{roomState.hostLightningAddress}</p>
+            <p className="text-gray-400 text-sm mt-1">{}</p>
           </div>
           <button
             onClick={handleLeave}

@@ -15,11 +15,8 @@ import {
   RoomErrorType,
   CreateRoomPayload,
   RoomCreatedPayload,
-  LnParams,
   MakeRequestPayload,
-  InvoiceGeneratedPayload,
 } from '@mempool/shared';
-import { getInvoice, getLNParams } from './utils.js';
 
 const PORT = 8080;
 
@@ -143,10 +140,7 @@ function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
     roomCode: room.code,
     isHost: room.hostId === clientId,
     members: room.members,
-    hostLightningAddress: room.hostLightningAddress,
     // Convert millisats to sats
-    minSendable: Math.ceil(room.lnParams.minSendable),
-    maxSendable: Math.floor(room.lnParams.maxSendable),
 
     settledRequests: room.settledRequests,
   };
@@ -157,15 +151,6 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
   // Check if client is already in a room
   if (clientRooms.has(ws.clientId)) {
     sendError(ws, 'already_in_room', 'You are already in a room. Leave first.');
-    return;
-  }
-
-  let lnParams: LnParams;
-  try {
-    lnParams = await getLNParams(payload.lightningAddress);
-    console.log(lnParams);
-  } catch (error) {
-    sendError(ws, 'invalid_lightning_address', 'Invalid lightning address');
     return;
   }
 
@@ -181,8 +166,6 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     hostId: ws.clientId,
     members: [ws.clientId],
     createdAt: Date.now(),
-    hostLightningAddress: payload.lightningAddress,
-    lnParams: lnParams,
     settledRequests: [],
     pendingRequests: [],
   };
@@ -314,32 +297,6 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
   if (!room) {
     sendError(ws, 'room_not_found', 'Room not found.', roomCode);
     return;
-  }
-
-  try {
-    const invoice = await getInvoice(room.lnParams, payload.amount, payload.comment);
-
-    const response = createMessage('invoice-generated', {
-      invoice,
-    } as InvoiceGeneratedPayload);
-
-    room.pendingRequests.push({
-      createdAt: Date.now(),
-      amount: payload.amount,
-      lnUrl: invoice.pr,
-      url: payload.url,
-      roomCode,
-    });
-
-    ws.send(serializeMessage(response));
-  } catch (error) {
-    console.error(`Failed to generate invoice for room ${roomCode}:`, error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to generate invoice';
-    const errorResponse = createMessage('invoice-error', {
-      error: errorMessage,
-      roomCode,
-    });
-    ws.send(serializeMessage(errorResponse));
   }
 }
 

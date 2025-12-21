@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/websocket-context';
-import { isValidLightningAddress } from '../lib/utils';
+import { isValidNwcString } from '../lib/utils';
 
 export default function Home() {
   const navigate = useNavigate();
   const { connected, createRoom, joinRoom, roomState, error: wsError, clearError } = useWebSocket();
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [joinCode, setJoinCode] = useState('');
-  const [lightningAddress, setLightningAddress] = useState('');
+  const [nwcUrl, setNwcUrl] = useState('');
   const [showCreateInput, setShowCreateInput] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,21 +32,23 @@ export default function Home() {
 
   const handleCreateRoom = () => {
     // Trim and validate lightning address
-    const lnAddress = lightningAddress.trim();
-    if (!lnAddress) {
-      setLocalError('Please enter a lightning address');
+
+    if (!nwcUrl) {
+      setLocalError('Please enter an NWC string');
       return;
     }
 
-    if (!isValidLightningAddress(lnAddress)) {
-      setLocalError('Invalid lightning address format');
+    if (!isValidNwcString(nwcUrl)) {
+      setLocalError('Invalid NWC string format');
       return;
     }
 
+    // Parse the connection string to extract the pubkey
     setLocalError(null);
     clearError();
     setIsLoading(true);
-    createRoom({ lightningAddress: lnAddress });
+
+    createRoom({ nwcUrl });
   };
 
   const handleJoinRoom = () => {
@@ -98,12 +100,12 @@ export default function Home() {
 
         {showCreateInput && (
           <div className="max-w-md mx-auto">
-            <p className="text-gray-400 mb-4">Enter your lightning address to receive payments</p>
+            <p className="text-gray-400 mb-4">Enter your NWC String in order to connect</p>
             <input
               type="text"
-              value={lightningAddress}
-              onChange={(e) => setLightningAddress(e.target.value)}
-              placeholder="you@wallet.com"
+              value={nwcUrl}
+              onChange={(e) => setNwcUrl(e.target.value)}
+              placeholder="nwc://<your-nwc-string>"
               className="w-full px-4 py-3 bg-slate-700 text-gray-100 rounded-lg border border-slate-600 focus:border-indigo-500 focus:outline-none mb-4"
               onKeyDown={(e) => e.key === 'Enter' && handleCreateRoom()}
               autoFocus
@@ -112,7 +114,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   setShowCreateInput(false);
-                  setLightningAddress('');
+                  setNwcUrl('');
                   setLocalError(null);
                   clearError();
                 }}
