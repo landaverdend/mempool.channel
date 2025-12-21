@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useWebSocket } from '../contexts/websocket-context';
 import InvoiceRequestModal from '../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
+import RoomHeader from '@/components/RoomHeader';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -95,47 +96,11 @@ export default function Room() {
 
   return (
     <div className="min-h-screen bg-bg text-gray-100">
+      <RoomHeader roomState={roomState} />
+
+      <RequestQueue roomState={roomState} />
+
       <div className="max-w-3xl mx-auto p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <span
-                className="font-mono text-indigo-400 cursor-pointer hover:text-indigo-300"
-                onClick={copyRoomCode}
-                title="Click to copy">
-                {roomState.roomCode}
-              </span>
-              {roomState.isHost && <span className="text-sm bg-yellow-600 px-2 py-1 rounded">HOST</span>}
-            </h1>
-            <p className="text-gray-400 text-sm mt-1">{}</p>
-          </div>
-          <button
-            onClick={handleLeave}
-            className={`px-4 py-2 rounded cursor-pointer transition-colors ${
-              roomState.isHost ? 'bg-red-700 hover:bg-red-600' : 'bg-orange-700 hover:bg-orange-600'
-            } text-gray-100`}>
-            {roomState.isHost ? 'Close Room' : 'Leave Room'}
-          </button>
-        </div>
-
-        {/* Request Queue */}
-
-        <RequestQueue roomState={roomState} />
-        {/* <div className="mb-4 p-4 bg-slate-800 rounded">
-          <h2 className="text-lg font-semibold">Request Queue</h2>
-          <ul className="space-y-2">
-            {roomState.requestQueue.map((request) => (
-              <li key={request.createdAt} className="text-sm">
-                <span className="font-mono text-xs">{request.requesterId}</span> spent {request.amount} to listen to{' '}
-                <a href={request.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
-                  {request.url}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div> */}
-
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 flex justify-between items-center">

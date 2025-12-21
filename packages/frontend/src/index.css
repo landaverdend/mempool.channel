@@ -3,8 +3,9 @@
 
 @theme {
   /* Mempool.space typography - Bootstrap system font stack */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', 'Liberation Sans', Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* Mempool.space color palette */
   /* Backgrounds */
@@ -31,7 +32,7 @@
   --color-primary: #007cfa;
   --color-secondary: #272f4e;
   --color-tertiary: #6225b2;
-  
+
   /* Brand / Title */
   --color-title: #2055e3;
   --color-link: #00ddff;
@@ -45,6 +46,13 @@
   --color-yellow: #fff000;
   --color-orange: #ff9f00;
   --color-grey: #7e7e7e;
+
+  --gradient-striped-progress: repeating-linear-gradient(
+    var(--secondary),
+    var(--secondary) 0.15697500000000275%,
+    var(--mainnet-alt) 0.15697500000000275%,
+    var(--primary) 100%
+  );
 
   /* Taproot accent */
   --color-taproot: #eba814;
@@ -71,7 +79,9 @@ body {
   @apply bg-bg text-fg antialiased font-sans;
 }
 
-code, pre, .mono {
+code,
+pre,
+.mono {
   @apply font-mono;
 }
 
