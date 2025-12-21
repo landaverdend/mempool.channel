@@ -12,7 +12,11 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
       <div className="flex flex-row gap-4 ">
         {requestQueue.length === 0 && <div>No requests in queue</div>}
         {requestQueue.map((request, i) => (
-          <RequestQueueItem key={request.createdAt} request={request} />
+          <span key={request.createdAt} className="flex flex-col items-center gap-1">
+            <span className="text-md text-link font-semibold">{i + 1}</span>
+            <RequestQueueItem key={request.createdAt} request={request} />
+            <span className="text-md font-bold">{request.requesterId}</span>
+          </span>
         ))}
       </div>
     </div>
@@ -26,10 +30,9 @@ function RequestQueueItem({ request }: { request: ClientRequest }) {
     <div
       className="w-[125px] h-[125px] flex flex-col items-center justify-center"
       style={{ background: 'var(--gradient-block)' }}>
-      <div className="">{request.requesterId}</div>
       <div className="font-bold flex items-center gap-1 text-2xl">
         {request.amount}
-        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <svg className="-skew-x-5" width="24px" height="24px" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M12.75 18.5V21H11.25V18.5H12.75Z" fill="white" />
           <path fill-rule="evenodd" clip-rule="evenodd" d="M17 16.75H7V15.25H17V16.75Z" fill="white" />
           <path fill-rule="evenodd" clip-rule="evenodd" d="M17 12.7499H7V11.2499H17V12.7499Z" fill="white" />
