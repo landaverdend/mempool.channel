@@ -28,10 +28,25 @@ type InvoiceResponse = {
   pr: string;
   routes: [];
 };
-export async function getInvoice(lnParams: LnParams, amount: number, comment: string): Promise<InvoiceResponse> {
+
+export async function getInvoice(
+  lnParams: LnParams,
+  amountSats: number,
+  comment?: string
+): Promise<InvoiceResponse> {
   const { callback } = lnParams;
 
-  const response = await fetch(`${callback}?amount=${amount}&comment=${comment}`, {
+  // Convert sats to millisats (LNURL-pay uses millisats)
+  const amountMsats = amountSats * 1000;
+
+  // Build URL with optional comment
+  const url = new URL(callback);
+  url.searchParams.set('amount', amountMsats.toString());
+  if (comment) {
+    url.searchParams.set('comment', comment);
+  }
+
+  const response = await fetch(url.toString(), {
     method: 'GET',
   });
 
@@ -39,7 +54,7 @@ export async function getInvoice(lnParams: LnParams, amount: number, comment: st
     throw new Error('Failed to generate invoice');
   }
 
-  const data = await response.json() as InvoiceResponse;
+  const data = (await response.json()) as InvoiceResponse;
 
   return data;
 }

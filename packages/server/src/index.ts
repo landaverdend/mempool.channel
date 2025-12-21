@@ -311,7 +311,7 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
   }
 
   try {
-    const invoice = await getInvoice(room.lnParams, payload.amount, payload.url);
+    const invoice = await getInvoice(room.lnParams, payload.amount, payload.comment);
 
     const response = createMessage('invoice-generated', {
       invoice,

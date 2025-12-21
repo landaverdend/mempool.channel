@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/websocket-context';
+import InvoiceRequestModal from '../components/InvoiceRequestModal';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -16,9 +17,11 @@ export default function Room() {
     makeRequest,
     sendRoomMessage,
     clearError,
+    clearInvoice,
   } = useWebSocket();
 
   const [messageInput, setMessageInput] = useState('');
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   // Redirect to home if not in this room
   useEffect(() => {
@@ -29,10 +32,10 @@ export default function Room() {
     }
   }, [roomState.roomCode, roomCode, navigate]);
 
-  // Log invoice when generated
+  // Close modal when invoice is generated
   useEffect(() => {
     if (invoiceState.invoice && !invoiceState.loading) {
-      console.log('Invoice generated:', invoiceState.invoice);
+      setShowInvoiceModal(false);
     }
   }, [invoiceState.invoice, invoiceState.loading]);
 
@@ -49,16 +52,20 @@ export default function Room() {
     }
   };
 
-  const handleMakeRequest = () => {
-    if (!roomState.roomCode) return;
-
-    const amount = prompt('Enter amount (in sats):');
-    const url = prompt('Enter URL/Message:');
-    if (!amount || !url) {
-      return;
+  const copyInvoice = () => {
+    if (invoiceState.invoice) {
+      navigator.clipboard.writeText(invoiceState.invoice);
     }
+  };
 
-    makeRequest({ roomCode: roomState.roomCode, amount: Number(amount), url });
+  const handleRequestPayment = (amount: number, comment?: string) => {
+    if (!roomState.roomCode) return;
+    makeRequest({ roomCode: roomState.roomCode, amount, comment });
+  };
+
+  const handleOpenModal = () => {
+    clearInvoice();
+    setShowInvoiceModal(true);
   };
 
   const handleLeave = () => {
@@ -139,17 +146,24 @@ export default function Room() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Request Payment</h2>
             <button
-              onClick={handleMakeRequest}
-              disabled={invoiceState.loading}
-              className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleOpenModal}
+              className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors"
             >
-              {invoiceState.loading ? 'Generating...' : 'Make Request'}
+              New Request
             </button>
           </div>
 
           {invoiceState.invoice && (
             <div className="mt-4 p-3 bg-slate-700 rounded">
-              <p className="text-sm text-gray-400 mb-2">Invoice:</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-gray-400">Invoice:</p>
+                <button
+                  onClick={copyInvoice}
+                  className="text-xs text-indigo-400 hover:text-indigo-300"
+                >
+                  Copy
+                </button>
+              </div>
               <p className="font-mono text-xs break-all text-green-400">{invoiceState.invoice}</p>
             </div>
           )}
@@ -207,6 +221,14 @@ export default function Room() {
           </div>
         </div>
       </div>
+
+      {/* Invoice Request Modal */}
+      <InvoiceRequestModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        onSubmit={handleRequestPayment}
+        isLoading={invoiceState.loading}
+      />
     </div>
   );
 }

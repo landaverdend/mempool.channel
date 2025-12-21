@@ -141,8 +141,8 @@ export interface LnParams {
 // Invoice request/response payloads
 export interface MakeRequestPayload {
   roomCode: string;
-  amount: number; // Amount in millisatoshis
-  url: string; // Comment/metadata for the invoice
+  amount: number; // Amount in satoshis
+  comment?: string; // Optional comment for the payment
 }
 
 export interface InvoiceGeneratedPayload {
