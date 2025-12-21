@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { useWebSocket } from '../contexts/websocket-context';
 import InvoiceRequestModal from '../components/InvoiceRequestModal';
 
@@ -154,7 +155,14 @@ export default function Room() {
                   Copy
                 </button>
               </div>
-              <p className="font-mono text-xs break-all text-green-400">{invoiceState.invoice}</p>
+              <div className="flex flex-col md:flex-row gap-4 items-start">
+                <div className="shrink-0 bg-white p-3 rounded">
+                  <QRCodeSVG value={invoiceState.invoice} size={200} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-xs break-all text-green-400">{invoiceState.invoice}</p>
+                </div>
+              </div>
             </div>
           )}
 
