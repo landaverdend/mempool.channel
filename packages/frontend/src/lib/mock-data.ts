@@ -1,36 +1,26 @@
-import { ClientRoomInfo } from '@mempool/shared';
+import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
 import { RoomMessage } from '@/contexts/websocket-context';
+
+const generateMockRequests = (clientIds: string[], count: number = 10) => {
+  const requests: ClientRequest[] = [];
+  for (let i = 0; i < count; i++) {
+    requests.push({
+      createdAt: Date.now() - i * 1000,
+      amount: Math.floor(Math.random() * 10000),
+      url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+      requesterId: clientIds[i % clientIds.length],
+    });
+  }
+  return requests;
+};
+
+const members = ['client_abc123', 'client_def456', 'client_ghi789'];
 
 export const MOCK_ROOM_STATE: ClientRoomInfo = {
   roomCode: 'DEMO42',
   isHost: true,
-  members: ['client_abc123', 'client_def456', 'client_ghi789'],
-  requestQueue: [
-    {
-      createdAt: Date.now() - 120000,
-      amount: 1000,
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      requesterId: 'client_def456',
-    },
-    {
-      createdAt: Date.now() - 60000,
-      amount: 2100,
-      url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT',
-      requesterId: 'client_ghi789',
-    },
-    {
-      createdAt: Date.now() - 30000,
-      amount: 500,
-      url: 'https://soundcloud.com/someartist/sometrack',
-      requesterId: 'client_abc123',
-    },
-    {
-      createdAt: Date.now() - 10000,
-      amount: 5000,
-      url: 'https://www.youtube.com/watch?v=abc123xyz',
-      requesterId: 'client_def456',
-    },
-  ],
+  members: members,
+  requestQueue: [...generateMockRequests(members)],
 };
 
 export const MOCK_ROOM_MESSAGES: RoomMessage[] = [
@@ -57,5 +47,4 @@ export const MOCK_ROOM_MESSAGES: RoomMessage[] = [
   },
 ];
 
-export const MOCK_INVOICE =
-  'lnbc21000n1pnxxx...mockInvoiceForDevMode...xxxEndOfMockInvoice';
+export const MOCK_INVOICE = 'lnbc21000n1pnxxx...mockInvoiceForDevMode...xxxEndOfMockInvoice';

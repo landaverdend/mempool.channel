@@ -119,7 +119,7 @@ pre,
 .block-3d::before {
   content: '';
   position: absolute;
-  top: -20px;
+  top: calc(-.16 * var(--block-size));
   width: calc(var(--block-size) + 1px);
   height: calc(.16 * var(--block-size));
   background: #232838;
@@ -130,11 +130,11 @@ pre,
 .block-3d::after {
   content: '';
   position: absolute;
-  top: -20px;
-  left: -20px;
+  top: calc(-.16 * var(--block-size)); 
+  left: calc(-.16 * var(--block-size));
   width: calc(.16 * 125px);
   height: var(--block-size);
-  background: #232838;;
+  background: #191c27;
   transform: skewY(45deg);
   transform-origin: top left;
 }

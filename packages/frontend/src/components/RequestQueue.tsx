@@ -12,8 +12,8 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
       <div className="flex flex-row gap-4 ">
         {requestQueue.length === 0 && <div>No requests in queue</div>}
         {requestQueue.map((request, i) => (
-          <span key={request.createdAt} className="flex flex-col items-center gap-5 pt-4 pl-6 ">
-            <span className="text-md text-link font-semibold">{i + 1}</span>
+          <span key={request.createdAt} className="flex flex-col items-center gap-5 pt-4 pl-6">
+            <span className="text-md text-link font-semibold pr-6">{i + 1}</span>
             <RequestQueueItem key={request.createdAt} request={request} />
             <span className="text-md font-bold">{request.requesterId}</span>
           </span>
