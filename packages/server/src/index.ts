@@ -15,6 +15,7 @@ import {
   CreateRoomPayload,
   MakeRequestPayload,
   ClientRoomInfo,
+  ClientRequest,
 } from '@mempool/shared';
 import { createNWCClient } from './nostrClient.js';
 import { Room } from './types.js';
@@ -25,6 +26,21 @@ const PORT = 8080;
 interface ExtendedWebSocket extends WebSocket {
   clientId: string;
 }
+
+const generateTestQueue = (clientId: string, count: number = 10) => {
+  const queue: ClientRequest[] = [];
+
+  for (let i = 0; i < count; i++) {
+    queue.push({
+      createdAt: Date.now(),
+      amount: Math.floor(Math.random() * 10000),
+      url: `https://example.com/${i}`,
+      requesterId: clientId,
+    });
+  }
+
+  return queue;
+};
 
 // Data structures for room management
 const clients = new Map<string, ExtendedWebSocket>();
@@ -176,7 +192,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     hostId: ws.clientId,
     members: [ws.clientId],
     createdAt: Date.now(),
-    requestQueue: [],
+    requestQueue: generateTestQueue(ws.clientId),
     pendingInvoices: [],
     nwcClient,
   };

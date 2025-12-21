@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { useWebSocket } from '../contexts/websocket-context';
 import InvoiceRequestModal from '../components/InvoiceRequestModal';
+import { RequestQueue } from '@/components/RequestQueue';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -119,7 +120,9 @@ export default function Room() {
         </div>
 
         {/* Request Queue */}
-        <div className="mb-4 p-4 bg-slate-800 rounded">
+
+        <RequestQueue roomState={roomState} />
+        {/* <div className="mb-4 p-4 bg-slate-800 rounded">
           <h2 className="text-lg font-semibold">Request Queue</h2>
           <ul className="space-y-2">
             {roomState.requestQueue.map((request) => (
@@ -131,7 +134,7 @@ export default function Room() {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         {/* Error Display */}
         {error && (

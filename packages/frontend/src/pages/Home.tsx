@@ -198,7 +198,7 @@ export default function Home() {
                   className="w-full py-3 bg-success hover:bg-success/80 disabled:bg-success/50 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed cursor-pointer ">
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-bg/30 border-t-bg rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Creating Room...
                     </span>
                   ) : (
