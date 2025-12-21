@@ -1,6 +1,5 @@
 import { ClientRequest } from "@mempool/shared";
-
-export const NWC_REQUEST_KIND = 23194 as const;
+import { NWCClient } from "@getalby/sdk";
 
 export interface Room {
   code: string;
@@ -10,6 +9,9 @@ export interface Room {
 
   settledRequests: ClientRequest[];
   pendingRequests: ServerRequest[];
+
+  // NWC client - only kept in memory for room duration
+  nwcClient: NWCClient;
 }
 
 export interface ServerRequest {
@@ -18,11 +20,4 @@ export interface ServerRequest {
   lnUrl: string; // LN URL to be used in invoice
   url: string;
   roomCode: string;
-}
-
-
-export interface NWCInfo {
-  walletPubkey: string;
-  relay: string;
-  secret: string;
 }

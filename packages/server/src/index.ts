@@ -16,7 +16,7 @@ import {
   RoomCreatedPayload,
   MakeRequestPayload,
 } from '@mempool/shared';
-import { getWalletInfo } from './nostrClient.js';
+import { createNWCClient } from './nostrClient.js';
 import { Room } from './types.js';
 
 const PORT = 8080;
@@ -155,12 +155,13 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     return;
   }
 
+  // Create and validate NWC client
+  let nwcClient;
   try {
-    const walletInfo = await getWalletInfo(payload.nwcUrl);
-    console.log('Wallet info:', walletInfo);
+    nwcClient = await createNWCClient(payload.nwcUrl);
   } catch (error) {
-    console.error('Error connecting to NWC: ', error);
-    sendError(ws, 'invalid_nwc_uri', 'Failed to connect to NWC wallet.', payload.nwcUrl);
+    console.error('Error connecting to NWC:', error);
+    sendError(ws, 'invalid_nwc_uri', 'Failed to connect to NWC wallet.');
     return;
   }
 
@@ -170,7 +171,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     roomCode = generateRoomCode();
   } while (rooms.has(roomCode));
 
-  // Create room
+  // Create room with NWC client
   const room: Room = {
     code: roomCode,
     hostId: ws.clientId,
@@ -178,6 +179,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     createdAt: Date.now(),
     settledRequests: [],
     pendingRequests: [],
+    nwcClient,
   };
 
   rooms.set(roomCode, room);
@@ -364,6 +366,13 @@ function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected'
   if (!room) return;
 
   console.log(`Closing room ${roomCode}: ${reason}`);
+
+  // Clean up NWC client
+  try {
+    room.nwcClient.close();
+  } catch (err) {
+    console.error('Error closing NWC client:', err);
+  }
 
   // Notify all members
   const closeMessage = createMessage('room-closed', {
