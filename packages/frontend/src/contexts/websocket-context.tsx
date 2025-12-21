@@ -23,6 +23,9 @@ export interface RoomState {
   isHost: boolean;
   members: string[];
   hostLightningAddress: string;
+
+  minSendable: number;
+  maxSendable: number;
 }
 
 export interface RoomMessage {
@@ -86,6 +89,9 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     isHost: false,
     members: [],
     hostLightningAddress: '',
+
+    minSendable: 0,
+    maxSendable: 0,
   });
   const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
   const [invoiceState, setInvoiceState] = useState<InvoiceState>({
@@ -124,6 +130,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           isHost: true,
           members: [clientIdRef.current || ''],
           hostLightningAddress: payload.hostLightningAddress,
+          minSendable: payload.minSendable,
+          maxSendable: payload.maxSendable,
         });
         setRoomMessages([]);
         setError(null);
@@ -133,10 +141,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       case 'room-joined': {
         const payload = message.payload as RoomJoinedPayload;
         setRoomState({
-          roomCode: payload.roomCode,
-          isHost: payload.isHost,
-          members: payload.members,
-          hostLightningAddress: payload.hostLightningAddress,
+          ...payload,
         });
         setRoomMessages([]);
         setError(null);
@@ -144,14 +149,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       }
 
       case 'room-left': {
-        setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '' });
+        setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '', minSendable: 0, maxSendable: 0 });
         setRoomMessages([]);
         break;
       }
 
       case 'room-closed': {
         const payload = message.payload as RoomClosedPayload;
-        setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '' });
+        setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '', minSendable: 0, maxSendable: 0 });
         setRoomMessages([]);
         const reasonText = payload.reason.replace(/_/g, ' ');
         setError(`Room closed: ${reasonText}`);
@@ -234,7 +239,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     socket.onclose = () => {
       setConnected(false);
       setClientId(null);
-      setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '' });
+      setRoomState({ roomCode: null, isHost: false, members: [], hostLightningAddress: '', minSendable: 0, maxSendable: 0 });
       setRoomMessages([]);
       wsRef.current = null;
       console.log('Disconnected from server');

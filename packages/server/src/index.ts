@@ -181,6 +181,8 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     roomCode,
     isHost: true,
     hostLightningAddress: payload.lightningAddress,
+    maxSendable: lnParams.maxSendable,
+    minSendable: lnParams.minSendable,
   } as RoomCreatedPayload);
   ws.send(serializeMessage(response));
 }
@@ -293,7 +295,6 @@ function handleRoomMessage(ws: ExtendedWebSocket, payload: RoomMessagePayload): 
     }
   });
 }
-
 
 async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayload): Promise<void> {
   const roomCode = normalizeRoomCode(payload.roomCode || '');

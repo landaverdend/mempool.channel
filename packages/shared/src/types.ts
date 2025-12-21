@@ -79,6 +79,8 @@ export interface RoomCreatedPayload {
   roomCode: string;
   isHost: true;
   hostLightningAddress: string;
+  minSendable: number;
+  maxSendable: number;
 }
 
 export interface RoomJoinedPayload {
@@ -86,6 +88,9 @@ export interface RoomJoinedPayload {
   isHost: boolean;
   members: string[];
   hostLightningAddress: string;
+
+  minSendable: number;
+  maxSendable: number;
 }
 
 export interface RoomLeftPayload {
