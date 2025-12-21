@@ -18,6 +18,7 @@ import {
   RoomCreatedPayload,
   LnParams,
   MakeRequestPayload,
+  InvoiceGeneratedPayload,
 } from '@mempool/shared';
 import { getInvoice, getLNParams } from './utils.js';
 
@@ -293,6 +294,7 @@ function handleRoomMessage(ws: ExtendedWebSocket, payload: RoomMessagePayload): 
   });
 }
 
+
 async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayload): Promise<void> {
   const roomCode = normalizeRoomCode(payload.roomCode || '');
 
@@ -308,12 +310,22 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
     return;
   }
 
-  const invoice = await getInvoice(room.lnParams, payload.amount, payload.url);
+  try {
+    const invoice = await getInvoice(room.lnParams, payload.amount, payload.url);
 
-  const response = createMessage('invoice-generated', {
-    invoice,
-  });
-  ws.send(serializeMessage(response));
+    const response = createMessage('invoice-generated', {
+      invoice,
+    } as InvoiceGeneratedPayload);
+    ws.send(serializeMessage(response));
+  } catch (error) {
+    console.error(`Failed to generate invoice for room ${roomCode}:`, error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate invoice';
+    const errorResponse = createMessage('invoice-error', {
+      error: errorMessage,
+      roomCode,
+    });
+    ws.send(serializeMessage(errorResponse));
+  }
 }
 
 function handleDisconnect(ws: ExtendedWebSocket): void {

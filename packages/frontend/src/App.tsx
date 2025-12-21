@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useWebSocket } from './contexts/websocket-context';
 import MessageDebug from './components/message-debug';
 import { isValidLightningAddress } from './lib/utils';
@@ -10,6 +10,7 @@ function App() {
     messages,
     error,
     roomState,
+    invoiceState,
     roomMessages,
     connect,
     disconnect,
@@ -72,6 +73,12 @@ function App() {
 
     makeRequest({ roomCode: roomState.roomCode, amount: Number(amount), url });
   };
+
+  useEffect(() => {
+    if (invoiceState.invoice && !invoiceState.loading) {
+      console.log('Invoice generated: ', invoiceState.invoice);
+    }
+  }, [invoiceState.invoice]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-gray-100 font-sans">

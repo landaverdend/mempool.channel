@@ -13,8 +13,9 @@ export type MessageType =
   | 'data'
 
   // Invoice Messages
-  | 'invoice-generated'
   | 'make-request'
+  | 'invoice-generated'
+  | 'invoice-error'
 
   // Room message types
   | 'create-room'
@@ -135,4 +136,23 @@ export interface LnParams {
   commentAllowed: number; // Optional number of characters accepted for the `comment` query parameter on subsequent callback, defaults to 0 if not provided. (no comment allowed)
   withdrawLink: string; // Optional lnurl-withdraw link (for explanation see justification.md)
   tag: 'payRequest'; // Type of LNURL
+}
+
+// Invoice request/response payloads
+export interface MakeRequestPayload {
+  roomCode: string;
+  amount: number; // Amount in millisatoshis
+  url: string; // Comment/metadata for the invoice
+}
+
+export interface InvoiceGeneratedPayload {
+  invoice: {
+    pr: string; // BOLT11 payment request
+    routes: unknown[];
+  };
+}
+
+export interface InvoiceErrorPayload {
+  error: string;
+  roomCode: string;
 }

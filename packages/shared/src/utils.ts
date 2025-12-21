@@ -39,6 +39,7 @@ const VALID_MESSAGE_TYPES = [
   'close-room',
   'make-request',
   'invoice-generated',
+  'invoice-error',
   'room-message',
   'room-created',
   'room-joined',

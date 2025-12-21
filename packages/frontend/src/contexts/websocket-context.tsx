@@ -13,6 +13,8 @@ import {
   RoomMessageReceivedPayload,
   CreateRoomPayload,
   MakeRequestPayload,
+  InvoiceGeneratedPayload,
+  InvoiceErrorPayload,
 } from '@mempool/shared';
 
 // Types
@@ -31,6 +33,12 @@ export interface RoomMessage {
   timestamp: number;
 }
 
+export interface InvoiceState {
+  invoice: string | null; // BOLT11 payment request
+  loading: boolean;
+  error: string | null;
+}
+
 interface WebSocketContextValue {
   // Connection state
   connected: boolean;
@@ -41,6 +49,9 @@ interface WebSocketContextValue {
   // Room state
   roomState: RoomState;
   roomMessages: RoomMessage[];
+
+  // Invoice state
+  invoiceState: InvoiceState;
 
   // Connection actions
   connect: () => void;
@@ -57,6 +68,7 @@ interface WebSocketContextValue {
 
   // Utility actions
   clearError: () => void;
+  clearInvoice: () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
@@ -76,6 +88,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     hostLightningAddress: '',
   });
   const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
+  const [invoiceState, setInvoiceState] = useState<InvoiceState>({
+    invoice: null,
+    loading: false,
+    error: null,
+  });
 
   const wsRef = useRef<WebSocket | null>(null);
   const clientIdRef = useRef<string | null>(null);
@@ -179,6 +196,26 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         setError(payload.message);
         break;
       }
+
+      case 'invoice-generated': {
+        const payload = message.payload as InvoiceGeneratedPayload;
+        setInvoiceState({
+          invoice: payload.invoice.pr,
+          loading: false,
+          error: null,
+        });
+        break;
+      }
+
+      case 'invoice-error': {
+        const payload = message.payload as InvoiceErrorPayload;
+        setInvoiceState({
+          invoice: null,
+          loading: false,
+          error: payload.error,
+        });
+        break;
+      }
     }
   }, []);
 
@@ -231,10 +268,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const makeRequest = useCallback(
     (requestPayload: MakeRequestPayload) => {
+      setInvoiceState({ invoice: null, loading: true, error: null });
       sendMessage('make-request', requestPayload);
     },
     [sendMessage]
   );
+
+  const clearInvoice = useCallback(() => {
+    setInvoiceState({ invoice: null, loading: false, error: null });
+  }, []);
 
   const createRoom = useCallback(
     (createRoomPayload: CreateRoomPayload) => {
@@ -294,6 +336,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     error,
     roomState,
     roomMessages,
+    invoiceState,
     connect,
     disconnect,
     sendPing,
@@ -304,6 +347,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     closeRoom,
     sendRoomMessage,
     clearError,
+    clearInvoice,
   };
 
   return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
