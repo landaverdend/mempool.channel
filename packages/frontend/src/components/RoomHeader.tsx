@@ -1,13 +1,29 @@
+import { useWebSocket } from '@/contexts/websocket-context';
 import { ClientRoomInfo } from '@mempool/shared';
+import { useNavigate } from 'react-router-dom';
 
 type RoomHeaderProps = {
   roomState: ClientRoomInfo;
 };
 
 export default function RoomHeader({ roomState }: RoomHeaderProps) {
-  const copyRoomCode = () => {};
+  const { leaveRoom, closeRoom } = useWebSocket();
+  const navigate = useNavigate();
 
-  const handleLeave = () => {};
+  const copyRoomCode = () => {
+    if (roomState.roomCode) {
+      navigator.clipboard.writeText(roomState.roomCode);
+    }
+  };
+
+  const handleLeave = () => {
+    if (roomState.isHost) {
+      closeRoom();
+    } else {
+      leaveRoom();
+    }
+    navigate('/');
+  };
 
   return (
     <div className="flex items-center justify-between mb-6">

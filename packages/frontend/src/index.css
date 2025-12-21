@@ -47,11 +47,14 @@
   --color-orange: #ff9f00;
   --color-grey: #7e7e7e;
 
-  --gradient-striped-progress: repeating-linear-gradient(
-    var(--secondary),
-    var(--secondary) 0.15697500000000275%,
-    var(--mainnet-alt) 0.15697500000000275%,
-    var(--primary) 100%
+  /* Block gradient */
+  --color-mainnet-alt: #4a1a8c;
+
+  --gradient-block: repeating-linear-gradient(
+    var(--color-secondary),
+    var(--color-secondary) 0.1564249999999987%,
+    var(--color-mainnet-alt) 0.1564249999999987%,
+    var(--color-primary) 100%
   );
 
   /* Taproot accent */

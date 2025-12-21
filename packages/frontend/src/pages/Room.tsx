@@ -9,19 +9,8 @@ import RoomHeader from '@/components/RoomHeader';
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
-  const {
-    connected,
-    roomState,
-    roomMessages,
-    invoiceState,
-    error,
-    leaveRoom,
-    closeRoom,
-    makeRequest,
-    sendRoomMessage,
-    clearError,
-    clearInvoice,
-  } = useWebSocket();
+  const { connected, roomState, roomMessages, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } =
+    useWebSocket();
 
   const [messageInput, setMessageInput] = useState('');
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -49,12 +38,6 @@ export default function Room() {
     }
   };
 
-  const copyRoomCode = () => {
-    if (roomState.roomCode) {
-      navigator.clipboard.writeText(roomState.roomCode);
-    }
-  };
-
   const copyInvoice = () => {
     if (invoiceState.invoice) {
       navigator.clipboard.writeText(invoiceState.invoice);
@@ -69,15 +52,6 @@ export default function Room() {
   const handleOpenModal = () => {
     clearInvoice();
     setShowInvoiceModal(true);
-  };
-
-  const handleLeave = () => {
-    if (roomState.isHost) {
-      closeRoom();
-    } else {
-      leaveRoom();
-    }
-    navigate('/');
   };
 
   if (!connected) {
