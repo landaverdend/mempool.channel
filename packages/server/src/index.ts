@@ -16,11 +16,8 @@ import {
   RoomCreatedPayload,
   MakeRequestPayload,
 } from '@mempool/shared';
-import { ensureRelay, parseNWC } from './nostrClient.js';
-import { useWebSocketImplementation } from 'nostr-tools/relay';
+import { getWalletInfo } from './nostrClient.js';
 import { Room } from './types.js';
-
-useWebSocketImplementation(WebSocket);
 
 const PORT = 8080;
 
@@ -159,11 +156,11 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
   }
 
   try {
-    const nwc = parseNWC(payload.nwcUrl);
-    const relay = await ensureRelay(nwc.relay);
+    const walletInfo = await getWalletInfo(payload.nwcUrl);
+    console.log('Wallet info:', walletInfo);
   } catch (error) {
-    console.error('Error ensuring relay: ', error);
-    sendError(ws, 'invalid_nwc_uri', 'Invalid NWC URI.', payload.nwcUrl);
+    console.error('Error connecting to NWC: ', error);
+    sendError(ws, 'invalid_nwc_uri', 'Failed to connect to NWC wallet.', payload.nwcUrl);
     return;
   }
 

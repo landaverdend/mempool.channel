@@ -1,5 +1,7 @@
 import { ClientRequest } from "@mempool/shared";
 
+export const NWC_REQUEST_KIND = 23194 as const;
+
 export interface Room {
   code: string;
   hostId: string;

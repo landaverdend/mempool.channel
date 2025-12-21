@@ -1,10 +1,9 @@
-import { WebSocket } from 'ws';
-import { SimplePool, useWebSocketImplementation } from 'nostr-tools/pool';
+import 'websocket-polyfill';
+import { NWCClient, Nip47GetInfoResponse } from '@getalby/sdk';
 import { NWCInfo } from './types.js';
 
-useWebSocketImplementation(WebSocket);
-
-const globalRelayPool = new SimplePool({ enablePing: true });
+// Store active NWC clients
+const nwcClients = new Map<string, NWCClient>();
 
 export function parseNWC(uri: string): NWCInfo {
   const url = new URL(uri);
@@ -23,6 +22,30 @@ export function parseNWC(uri: string): NWCInfo {
   };
 }
 
-export async function ensureRelay(relayUrl: string) {
-  return await globalRelayPool.ensureRelay(relayUrl);
+export async function getWalletInfo(nwcUri: string): Promise<Nip47GetInfoResponse> {
+  console.log('Creating NWC client...');
+
+  const client = new NWCClient({
+    nostrWalletConnectUrl: nwcUri,
+  });
+
+  try {
+    console.log('Calling getInfo...');
+    const info = await client.getInfo();
+    console.log('Got wallet info:', info);
+    return info;
+  } finally {
+    client.close();
+  }
+}
+
+export async function createNWCClient(nwcUri: string): Promise<NWCClient> {
+  const client = new NWCClient({
+    nostrWalletConnectUrl: nwcUri,
+  });
+
+  // Test the connection
+  await client.getInfo();
+
+  return client;
 }
