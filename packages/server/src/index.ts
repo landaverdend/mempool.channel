@@ -148,6 +148,8 @@ function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
     // Convert millisats to sats
     minSendable: Math.ceil(room.lnParams.minSendable),
     maxSendable: Math.floor(room.lnParams.maxSendable),
+
+    settledRequests: room.settledRequests,
   };
 }
 
@@ -182,6 +184,8 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     createdAt: Date.now(),
     hostLightningAddress: payload.lightningAddress,
     lnParams: lnParams,
+    settledRequests: [],
+    pendingRequests: [],
   };
 
   rooms.set(roomCode, room);
@@ -319,6 +323,14 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
     const response = createMessage('invoice-generated', {
       invoice,
     } as InvoiceGeneratedPayload);
+
+    room.pendingRequests.push({
+      createdAt: Date.now(),
+      amount: payload.amount,
+      lnUrl: invoice.pr,
+      url: payload.url,
+    });
+
     ws.send(serializeMessage(response));
   } catch (error) {
     console.error(`Failed to generate invoice for room ${roomCode}:`, error);

@@ -58,9 +58,9 @@ export default function Room() {
     }
   };
 
-  const handleRequestPayment = (amount: number, comment?: string) => {
+  const handleRequestPayment = (amount: number, url: string, comment?: string) => {
     if (!roomState.roomCode) return;
-    makeRequest({ roomCode: roomState.roomCode, amount, comment });
+    makeRequest({ roomCode: roomState.roomCode, amount, comment, url });
   };
 
   const handleOpenModal = () => {
@@ -101,24 +101,18 @@ export default function Room() {
               <span
                 className="font-mono text-indigo-400 cursor-pointer hover:text-indigo-300"
                 onClick={copyRoomCode}
-                title="Click to copy"
-              >
+                title="Click to copy">
                 {roomState.roomCode}
               </span>
-              {roomState.isHost && (
-                <span className="text-sm bg-yellow-600 px-2 py-1 rounded">HOST</span>
-              )}
+              {roomState.isHost && <span className="text-sm bg-yellow-600 px-2 py-1 rounded">HOST</span>}
             </h1>
             <p className="text-gray-400 text-sm mt-1">{roomState.hostLightningAddress}</p>
           </div>
           <button
             onClick={handleLeave}
             className={`px-4 py-2 rounded cursor-pointer transition-colors ${
-              roomState.isHost
-                ? 'bg-red-700 hover:bg-red-600'
-                : 'bg-orange-700 hover:bg-orange-600'
-            } text-gray-100`}
-          >
+              roomState.isHost ? 'bg-red-700 hover:bg-red-600' : 'bg-orange-700 hover:bg-orange-600'
+            } text-gray-100`}>
             {roomState.isHost ? 'Close Room' : 'Leave Room'}
           </button>
         </div>
@@ -147,8 +141,7 @@ export default function Room() {
             <h2 className="text-lg font-semibold">Request Payment</h2>
             <button
               onClick={handleOpenModal}
-              className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors"
-            >
+              className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors">
               New Request
             </button>
           </div>
@@ -157,10 +150,7 @@ export default function Room() {
             <div className="mt-4 p-3 bg-slate-700 rounded">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-400">Invoice:</p>
-                <button
-                  onClick={copyInvoice}
-                  className="text-xs text-indigo-400 hover:text-indigo-300"
-                >
+                <button onClick={copyInvoice} className="text-xs text-indigo-400 hover:text-indigo-300">
                   Copy
                 </button>
               </div>
@@ -169,9 +159,7 @@ export default function Room() {
           )}
 
           {invoiceState.error && (
-            <div className="mt-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200">
-              {invoiceState.error}
-            </div>
+            <div className="mt-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200">{invoiceState.error}</div>
           )}
         </div>
 
@@ -185,17 +173,11 @@ export default function Room() {
               ) : (
                 roomMessages.map((msg) => (
                   <li key={msg.id} className="text-sm">
-                    <span
-                      className={`font-mono text-xs ${
-                        msg.isHost ? 'text-yellow-400' : 'text-indigo-400'
-                      }`}
-                    >
+                    <span className={`font-mono text-xs ${msg.isHost ? 'text-yellow-400' : 'text-indigo-400'}`}>
                       {msg.senderId}
                       {msg.isHost && ' (host)'}
                     </span>
-                    <span className="text-gray-500 text-xs ml-2">
-                      {new Date(msg.timestamp).toLocaleTimeString()}
-                    </span>
+                    <span className="text-gray-500 text-xs ml-2">{new Date(msg.timestamp).toLocaleTimeString()}</span>
                     <p className="text-gray-100">{String(msg.content)}</p>
                   </li>
                 ))
@@ -214,8 +196,7 @@ export default function Room() {
             <button
               onClick={handleSendMessage}
               disabled={!messageInput.trim()}
-              className="px-4 py-2 bg-indigo-700 text-gray-100 rounded cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+              className="px-4 py-2 bg-indigo-700 text-gray-100 rounded cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               Send
             </button>
           </div>

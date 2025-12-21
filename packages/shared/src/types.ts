@@ -42,12 +42,21 @@ export interface DataPayload {
 }
 
 // Room types
+
+export interface ServerRequest {
+  createdAt: number;
+  amount: number;
+  lnUrl: string; // LN URL to be used in invoice
+  url: string;
+}
 export interface Room {
   code: string;
   hostId: string;
   members: string[];
   createdAt: number;
 
+  settledRequests: ClientRequest[];
+  pendingRequests: ServerRequest[];
   hostLightningAddress: string;
   lnParams: LnParams; // We might not want to expose this to the client.
 }
@@ -74,6 +83,13 @@ export interface CreateRoomPayload {
   lightningAddress: string;
 }
 
+// Client request info sent to clients (subset of server Request)
+export interface ClientRequest {
+  createdAt: number;
+  amount: number;
+  url: string;
+}
+
 // Shared room info sent to clients (subset of server Room)
 export interface ClientRoomInfo {
   roomCode: string;
@@ -82,6 +98,8 @@ export interface ClientRoomInfo {
   hostLightningAddress: string;
   minSendable: number; // in sats
   maxSendable: number; // in sats
+
+  settledRequests: ClientRequest[];
 }
 
 // Room response payloads
@@ -143,6 +161,7 @@ export interface MakeRequestPayload {
   roomCode: string;
   amount: number; // Amount in satoshis
   comment?: string; // Optional comment for the payment
+  url: string; // URL that links to the next track/video
 }
 
 export interface InvoiceGeneratedPayload {

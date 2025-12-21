@@ -4,7 +4,7 @@ import { useState } from 'react';
 interface InvoiceRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (amount: number, comment?: string) => void;
+  onSubmit: (amount: number, url: string, comment?: string) => void;
   isLoading: boolean;
 }
 
@@ -13,6 +13,7 @@ export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoadi
 
   const [amount, setAmount] = useState(roomState.minSendable.toString());
   const [comment, setComment] = useState('');
+  const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -44,12 +45,13 @@ export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoadi
     }
 
     setError(null);
-    onSubmit(amountNum, comment.trim() || undefined);
+    onSubmit(amountNum, url.trim(), comment.trim() || undefined);
   };
 
   const handleClose = () => {
     setAmount('');
     setComment('');
+    setUrl('');
     setError(null);
     onClose();
   };
@@ -77,6 +79,20 @@ export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoadi
               placeholder="21000"
               className="w-full px-4 py-3 bg-slate-700 text-gray-100 rounded-lg border border-slate-600 focus:border-indigo-500 focus:outline-none"
               autoFocus
+            />
+          </div>
+
+          {/* URL */}
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">
+              URL <span className="text-gray-600"></span>
+            </label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="w-full px-4 py-3 bg-slate-700 text-gray-100 rounded-lg border border-slate-600 focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
