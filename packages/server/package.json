@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@mempool/shared": "workspace:*",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "nostr-tools": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",

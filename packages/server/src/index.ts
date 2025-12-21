@@ -17,6 +17,7 @@ import {
   RoomCreatedPayload,
   MakeRequestPayload,
 } from '@mempool/shared';
+import { parseNWC } from './nostr-client.js';
 
 const PORT = 8080;
 
@@ -151,6 +152,14 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
   // Check if client is already in a room
   if (clientRooms.has(ws.clientId)) {
     sendError(ws, 'already_in_room', 'You are already in a room. Leave first.');
+    return;
+  }
+
+  try {
+    const nwc = parseNWC(payload.nwcUrl);
+    console.log('nwc: ', nwc);
+  } catch (error) {
+    sendError(ws, 'invalid_nwc_uri', 'Invalid NWC URI.', payload.nwcUrl);
     return;
   }
 

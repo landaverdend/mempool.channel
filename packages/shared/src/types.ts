@@ -123,7 +123,7 @@ export type RoomErrorType =
   | 'not_in_room'
   | 'not_host'
   | 'invalid_code'
-  | 'invalid_lightning_address';
+  | 'invalid_nwc_uri';
 
 export interface UserJoinedPayload {
   roomCode: string;

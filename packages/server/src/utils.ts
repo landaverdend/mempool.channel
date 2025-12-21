@@ -1,3 +1,5 @@
+
+
 // function transformAddressToUrl(lightningAddress: string): string {
 //   const [username, domain] = lightningAddress.split('@');
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/websocket-context';
-import { isValidNwcString } from '../lib/utils';
 
 export default function Home() {
   const navigate = useNavigate();
+
   const { connected, createRoom, joinRoom, roomState, error: wsError, clearError } = useWebSocket();
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [joinCode, setJoinCode] = useState('');
@@ -35,11 +35,6 @@ export default function Home() {
 
     if (!nwcUrl) {
       setLocalError('Please enter an NWC string');
-      return;
-    }
-
-    if (!isValidNwcString(nwcUrl)) {
-      setLocalError('Invalid NWC string format');
       return;
     }
 

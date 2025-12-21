@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@getalby/sdk": "^7.0.0",
     "@mempool/shared": "workspace:*",
     "@radix-ui/react-dialog": "^1.1.15",
     "class-variance-authority": "^0.7.1",
