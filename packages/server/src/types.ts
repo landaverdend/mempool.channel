@@ -18,7 +18,7 @@ export interface Room {
   members: string[];
   createdAt: number;
 
-  settledRequests: ClientRequest[];
+  requestQueue: ClientRequest[];
   pendingInvoices: PendingInvoice[];
 
   // NWC client - only kept in memory for room duration

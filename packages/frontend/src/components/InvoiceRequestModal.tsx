@@ -1,3 +1,4 @@
+import { isValidUrl } from '@/lib/utils';
 import { useState } from 'react';
 
 interface InvoiceRequestModalProps {
@@ -15,16 +16,28 @@ export default function InvoiceRequestModal({ isOpen, onClose, onSubmit, isLoadi
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
+  const isValid = () => {
     const amountNum = parseInt(amount, 10);
-
     if (!amount || isNaN(amountNum) || amountNum <= 0) {
       setError('Please enter a valid amount');
       return;
     }
 
+    if (!isValidUrl(url)) {
+      setError('Please enter a valid URL');
+      return;
+    }
+
+    return amount && url;
+  };
+
+  const handleSubmit = () => {
+    if (!isValid()) {
+      return;
+    }
+
     setError(null);
-    onSubmit(amountNum, url.trim(), comment.trim() || undefined);
+    onSubmit(parseInt(amount, 10), url.trim(), comment.trim() || undefined);
   };
 
   const handleClose = () => {

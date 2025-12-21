@@ -78,7 +78,7 @@ export interface ClientRoomInfo {
   isHost: boolean;
   members: string[];
 
-  settledRequests: ClientRequest[];
+  requestQueue: ClientRequest[];
 }
 
 // Room response payloads

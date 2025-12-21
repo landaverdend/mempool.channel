@@ -35,7 +35,7 @@ const EMPTY_ROOM_STATE: ClientRoomInfo = {
   roomCode: '',
   isHost: false,
   members: [],
-  settledRequests: [],
+  requestQueue: [],
 };
 
 interface WebSocketContextValue {

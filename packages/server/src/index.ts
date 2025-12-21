@@ -142,8 +142,7 @@ function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
     isHost: room.hostId === clientId,
     members: room.members,
 
-    // Convert millisats to sats
-    settledRequests: room.settledRequests,
+    requestQueue: room.requestQueue,
   };
 }
 
@@ -177,7 +176,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     hostId: ws.clientId,
     members: [ws.clientId],
     createdAt: Date.now(),
-    settledRequests: [],
+    requestQueue: [],
     pendingInvoices: [],
     nwcClient,
   };
