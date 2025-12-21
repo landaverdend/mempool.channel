@@ -93,7 +93,7 @@ export default function Room() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-gray-100">
+    <div className="min-h-screen bg-bg text-gray-100">
       <div className="max-w-3xl mx-auto p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

@@ -1,2 +1,93 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "tailwindcss-animate";
+
+@theme {
+  /* Mempool.space typography - Bootstrap system font stack */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Mempool.space color palette */
+  /* Backgrounds */
+  --color-bg: #11131f;
+  --color-bg-active: #000000;
+  --color-bg-hover: #12131e;
+  --color-bg-box: #171c2a;
+  --color-bg-stat: #0b1018;
+  --color-bg-navbar: #212121;
+  --color-bg-alert: #3a1c61;
+  --color-bg-skeleton: #2e324e;
+  --color-bg-skeleton-light: #5d6182;
+  --color-bg-input: #1c2031;
+  --color-bg-progress: #282d47;
+
+  /* Foreground / Text */
+  --color-fg: #ffffff;
+  --color-fg-transparent: #ffffffbb;
+  --color-fg-muted: #b1b1b1;
+  --color-fg-icon: #f1f1f1;
+
+  /* Primary colors */
+  --color-primary: #007cfa;
+  --color-secondary: #272f4e;
+  --color-tertiary: #6225b2;
+
+  /* Brand / Title */
+  --color-title: #2055e3;
+  --color-link: #00ddff;
+
+  /* Status colors */
+  --color-success: #0aab2f;
+  --color-info: #00ddff;
+  --color-green: #83fd00;
+  --color-red: #ff3d00;
+  --color-yellow: #fff000;
+  --color-orange: #ff9f00;
+  --color-grey: #7e7e7e;
+
+  /* Taproot accent */
+  --color-taproot: #eba814;
+  --color-taproot-light: #d5a90a;
+  --color-taproot-dark: #9d7c05;
+
+  /* Network colors */
+  --color-mainnet: #9339f4;
+  --color-testnet: #1d486f;
+  --color-signet: #6f1d5d;
+  --color-liquid: #116761;
+
+  /* Search button */
+  --color-search: #4d2d77;
+  --color-search-border: #472a6e;
+  --color-search-focus: #533180;
+
+  /* Border */
+  --color-border: #20263e;
+}
+
+/* Base styles */
+body {
+  @apply bg-bg text-fg antialiased font-sans;
+}
+
+code, pre, .mono {
+  @apply font-mono;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tertiary);
+}

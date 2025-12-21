@@ -60,7 +60,7 @@ export default function Home() {
 
   if (!connected) {
     return (
-      <div className="min-h-screen bg-slate-900 text-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-bg text-gray-100 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">mempool.band</h1>
           <p className="text-gray-400">Connecting...</p>
@@ -70,9 +70,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-bg text-gray-100 flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-8">mempool.band</h1>
+        <h1 className="text-6xl font-semibold mb-8 tracking-wide flex flex-col items-start ">
+          <span>mempool</span>
+          <span className="text-tertiary">.band</span>
+        </h1>
 
         {error && (
           <div className="mb-6 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 max-w-md mx-auto">{error}</div>
