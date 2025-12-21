@@ -41,24 +41,6 @@ export interface DataPayload {
   data: unknown;
 }
 
-// Room types
-
-export interface ServerRequest {
-  createdAt: number;
-  amount: number;
-  lnUrl: string; // LN URL to be used in invoice
-  url: string;
-  roomCode: string;
-}
-export interface Room {
-  code: string;
-  hostId: string;
-  members: string[];
-  createdAt: number;
-
-  settledRequests: ClientRequest[];
-  pendingRequests: ServerRequest[];
-}
 
 // Room request payloads
 export interface JoinRoomPayload {

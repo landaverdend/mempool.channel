@@ -1,3 +1,7 @@
+import { SimplePool } from 'nostr-tools';
+
+export const relayMapping = new Map<string, SimplePool>();
+
 export function parseNWC(uri: string) {
   const url = new URL(uri);
   if (url.protocol !== 'nostr+walletconnect:') {

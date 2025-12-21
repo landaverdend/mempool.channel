@@ -7,7 +7,6 @@ import {
   generateRoomCode,
   isValidRoomCode,
   normalizeRoomCode,
-  Room,
   JoinRoomPayload,
   LeaveRoomPayload,
   CloseRoomPayload,
@@ -18,6 +17,10 @@ import {
   MakeRequestPayload,
 } from '@mempool/shared';
 import { parseNWC } from './nostr-client.js';
+import { useWebSocketImplementation } from 'nostr-tools/relay';
+import { Room } from './types.js';
+
+useWebSocketImplementation(WebSocket);
 
 const PORT = 8080;
 
@@ -141,8 +144,8 @@ function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
     roomCode: room.code,
     isHost: room.hostId === clientId,
     members: room.members,
-    // Convert millisats to sats
 
+    // Convert millisats to sats
     settledRequests: room.settledRequests,
   };
 }
@@ -157,7 +160,6 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
 
   try {
     const nwc = parseNWC(payload.nwcUrl);
-    console.log('nwc: ', nwc);
   } catch (error) {
     sendError(ws, 'invalid_nwc_uri', 'Invalid NWC URI.', payload.nwcUrl);
     return;
