@@ -15,6 +15,15 @@ import {
   InvoiceErrorPayload,
   ClientRoomInfo,
 } from '@mempool/shared';
+import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES, MOCK_INVOICE } from '@/lib/mock-data';
+
+// Dev mode: enable with ?dev query param or VITE_DEV_MODE env var
+const isDevMode = () => {
+  if (typeof window !== 'undefined') {
+    return new URLSearchParams(window.location.search).has('dev');
+  }
+  return false;
+};
 
 export interface RoomMessage {
   id: string;
@@ -74,13 +83,14 @@ const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 const WEBSOCKET_URL = 'ws://localhost:8080';
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
-  const [connected, setConnected] = useState(false);
+  const [devMode] = useState(isDevMode);
+  const [connected, setConnected] = useState(devMode);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [clientId, setClientId] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(devMode ? 'dev_client_123' : null);
   const [error, setError] = useState<string | null>(null);
 
-  const [roomState, setRoomState] = useState<ClientRoomInfo>(EMPTY_ROOM_STATE);
-  const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
+  const [roomState, setRoomState] = useState<ClientRoomInfo>(devMode ? MOCK_ROOM_STATE : EMPTY_ROOM_STATE);
+  const [roomMessages, setRoomMessages] = useState<RoomMessage[]>(devMode ? MOCK_ROOM_MESSAGES : []);
   const [invoiceState, setInvoiceState] = useState<InvoiceState>({
     invoice: null,
     loading: false,
@@ -89,6 +99,13 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const wsRef = useRef<WebSocket | null>(null);
   const clientIdRef = useRef<string | null>(null);
+
+  // Log dev mode status
+  useEffect(() => {
+    if (devMode) {
+      console.log('%c[DEV MODE] Using mock data', 'color: #00ff00; font-weight: bold');
+    }
+  }, [devMode]);
 
   // Keep clientIdRef in sync
   useEffect(() => {
@@ -203,6 +220,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const connect = useCallback(() => {
+    if (devMode) return; // Skip connection in dev mode
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const socket = new WebSocket(WEBSOCKET_URL);
@@ -229,7 +247,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     };
 
     wsRef.current = socket;
-  }, []);
+  }, [devMode]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -252,9 +270,31 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const makeRequest = useCallback(
     (requestPayload: MakeRequestPayload) => {
       setInvoiceState({ invoice: null, loading: true, error: null });
+      if (devMode) {
+        // Simulate invoice generation in dev mode
+        setTimeout(() => {
+          setInvoiceState({ invoice: MOCK_INVOICE, loading: false, error: null });
+          // Add to queue after "payment"
+          setTimeout(() => {
+            setRoomState((prev) => ({
+              ...prev,
+              requestQueue: [
+                ...prev.requestQueue,
+                {
+                  createdAt: Date.now(),
+                  amount: requestPayload.amount,
+                  url: requestPayload.url,
+                  requesterId: clientId || 'dev_client',
+                },
+              ],
+            }));
+          }, 1000);
+        }, 500);
+        return;
+      }
       sendMessage('make-request', requestPayload);
     },
-    [sendMessage]
+    [sendMessage, devMode, clientId]
   );
 
   const clearInvoice = useCallback(() => {
@@ -290,13 +330,27 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const sendRoomMessage = useCallback(
     (content: string) => {
       if (roomState.roomCode && content.trim()) {
+        if (devMode) {
+          // Add message locally in dev mode
+          setRoomMessages((prev) => [
+            ...prev,
+            {
+              id: `msg_${Date.now()}`,
+              senderId: clientId || 'dev_client',
+              content: content.trim(),
+              isHost: roomState.isHost,
+              timestamp: Date.now(),
+            },
+          ]);
+          return;
+        }
         sendMessage('room-message', {
           roomCode: roomState.roomCode,
           content: content.trim(),
         });
       }
     },
-    [sendMessage, roomState.roomCode]
+    [sendMessage, roomState.roomCode, devMode, clientId, roomState.isHost]
   );
 
   const clearError = useCallback(() => {
