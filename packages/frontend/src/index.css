@@ -73,6 +73,10 @@
   --color-search-border: #472a6e;
   --color-search-focus: #533180;
 
+
+  --block-size: 125px;
+
+
   /* Border */
   --color-border: #20263e;
 }
@@ -105,4 +109,32 @@ pre,
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-tertiary);
+}
+
+/* 3D Block effect */
+.block-3d {
+  position: relative;
+}
+
+.block-3d::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  width: calc(var(--block-size) + 1px);
+  height: calc(.16 * var(--block-size));
+  background: #232838;
+  transform: skewX(45deg);
+  transform-origin: bottom left;
+}
+
+.block-3d::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: calc(.16 * 125px);
+  height: var(--block-size);
+  background: #232838;;
+  transform: skewY(45deg);
+  transform-origin: top left;
 }

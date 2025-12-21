@@ -12,7 +12,7 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
       <div className="flex flex-row gap-4 ">
         {requestQueue.length === 0 && <div>No requests in queue</div>}
         {requestQueue.map((request, i) => (
-          <span key={request.createdAt} className="flex flex-col items-center gap-1">
+          <span key={request.createdAt} className="flex flex-col items-center gap-5 pt-4 pl-6 ">
             <span className="text-md text-link font-semibold">{i + 1}</span>
             <RequestQueueItem key={request.createdAt} request={request} />
             <span className="text-md font-bold">{request.requesterId}</span>
@@ -28,7 +28,7 @@ function RequestQueueItem({ request }: { request: ClientRequest }) {
 
   return (
     <div
-      className="w-[125px] h-[125px] flex flex-col items-center justify-center"
+      className="block-3d w-(--block-size) h-(--block-size) flex flex-col items-center justify-center"
       style={{ background: 'var(--gradient-block)' }}>
       <div className="font-bold flex items-center gap-1 text-2xl">
         {request.amount}
