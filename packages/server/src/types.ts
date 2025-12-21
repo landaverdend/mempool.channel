@@ -1,5 +1,16 @@
-import { ClientRequest } from "@mempool/shared";
-import { NWCClient } from "@getalby/sdk";
+import { ClientRequest } from '@mempool/shared';
+import { NWCClient } from '@getalby/sdk';
+
+export interface PendingInvoice {
+  paymentHash: string;
+  invoice: string;
+  amount: number;
+  description: string;
+  createdAt: number;
+  expiresAt: number;
+  roomCode: string;
+  requesterId: string; // client who requested the invoice
+}
 
 export interface Room {
   code: string;
@@ -8,16 +19,10 @@ export interface Room {
   createdAt: number;
 
   settledRequests: ClientRequest[];
-  pendingRequests: ServerRequest[];
+  pendingInvoices: PendingInvoice[];
 
   // NWC client - only kept in memory for room duration
   nwcClient: NWCClient;
-}
-
-export interface ServerRequest {
-  createdAt: number;
-  amount: number;
-  lnUrl: string; // LN URL to be used in invoice
-  url: string;
-  roomCode: string;
+  // Interval for polling invoice status
+  pollInterval?: ReturnType<typeof setInterval>;
 }

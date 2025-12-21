@@ -178,9 +178,12 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     members: [ws.clientId],
     createdAt: Date.now(),
     settledRequests: [],
-    pendingRequests: [],
+    pendingInvoices: [],
     nwcClient,
   };
+
+  // Start polling for invoice payments
+  room.pollInterval = setInterval(() => pollInvoices(roomCode), 3000);
 
   rooms.set(roomCode, room);
   clientRooms.set(ws.clientId, roomCode);
@@ -317,11 +320,28 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
       description: payload.comment,
     });
 
+    const now = Math.floor(Date.now() / 1000);
+    const expiresAt = now + 60 * 10; // expires in 10 minutes
+
+    // Track pending invoice for payment polling
+    room.pendingInvoices.push({
+      paymentHash: invoice.payment_hash,
+      invoice: invoice.invoice,
+      amount: invoice.amount,
+      description: invoice.description || '',
+      createdAt: now,
+      expiresAt,
+      roomCode,
+      requesterId: ws.clientId,
+    });
+
     const invoiceResponse = createMessage('invoice-generated', {
       invoice: {
         pr: invoice.invoice,
+        paymentHash: invoice.payment_hash,
         amount: invoice.amount,
         description: invoice.description,
+        expiresAt,
       },
     });
 
@@ -330,6 +350,44 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
     console.error('Error creating invoice: ', error);
     sendError(ws, 'invoice_error', 'Failed to create invoice.', roomCode);
     return;
+  }
+}
+
+async function pollInvoices(roomCode: string): Promise<void> {
+  const room = rooms.get(roomCode);
+  if (!room || room.pendingInvoices.length === 0) return;
+
+  const now = Math.floor(Date.now() / 1000);
+
+  console.log('Polling invoices for room: ', roomCode);
+
+  // Process each pending invoice
+  for (let i = room.pendingInvoices.length - 1; i >= 0; i--) {
+    const pending = room.pendingInvoices[i];
+
+    // Remove expired invoices
+    if (pending.expiresAt < now) {
+      room.pendingInvoices.splice(i, 1);
+      console.log(`Invoice expired: ${pending.paymentHash.substring(0, 8)}...`);
+      continue;
+    }
+
+    // Check payment status
+    try {
+      const lookup = await room.nwcClient.lookupInvoice({
+        payment_hash: pending.paymentHash,
+      });
+
+      console.log('Lookup: ', lookup);
+      if (lookup.settled_at) {
+        // Invoice paid - remove from pending and notify room
+        room.pendingInvoices.splice(i, 1);
+        console.log(`Invoice paid: ${pending.paymentHash.substring(0, 8)}...`);
+      }
+    } catch (err) {
+      // Log but don't remove - might be temporary error
+      console.error(`Error checking invoice ${pending.paymentHash.substring(0, 8)}:`, err);
+    }
   }
 }
 
@@ -387,6 +445,11 @@ function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected'
   if (!room) return;
 
   console.log(`Closing room ${roomCode}: ${reason}`);
+
+  // Stop polling for invoice payments
+  if (room.pollInterval) {
+    clearInterval(room.pollInterval);
+  }
 
   // Clean up NWC client
   try {

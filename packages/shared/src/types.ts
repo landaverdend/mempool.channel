@@ -23,6 +23,8 @@ export type MessageType =
   | 'leave-room'
   | 'close-room'
   | 'room-message'
+  | 'item-queued'
+
   // Room response types
   | 'room-created'
   | 'room-joined'
@@ -137,6 +139,7 @@ export interface InvoiceGeneratedPayload {
     pr: string; // BOLT11 payment request
     amount: number;
     description?: string;
+    expiresAt: number;
   };
 }
 
