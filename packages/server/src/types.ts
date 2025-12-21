@@ -18,3 +18,9 @@ export interface ServerRequest {
   roomCode: string;
 }
 
+
+export interface NWCInfo {
+  walletPubkey: string;
+  relay: string;
+  secret: string;
+}

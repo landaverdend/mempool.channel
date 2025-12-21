@@ -16,7 +16,7 @@ import {
   RoomCreatedPayload,
   MakeRequestPayload,
 } from '@mempool/shared';
-import { parseNWC } from './nostr-client.js';
+import { ensureRelay, parseNWC } from './nostrClient.js';
 import { useWebSocketImplementation } from 'nostr-tools/relay';
 import { Room } from './types.js';
 
@@ -160,7 +160,9 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
 
   try {
     const nwc = parseNWC(payload.nwcUrl);
+    const relay = await ensureRelay(nwc.relay);
   } catch (error) {
+    console.error('Error ensuring relay: ', error);
     sendError(ws, 'invalid_nwc_uri', 'Invalid NWC URI.', payload.nwcUrl);
     return;
   }
