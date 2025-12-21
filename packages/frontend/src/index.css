@@ -109,6 +109,16 @@ pre,
   background: var(--color-tertiary);
 }
 
+/* Hide scrollbar but keep scrollable */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* 3D Block effect */
 .block-3d {
   position: relative;

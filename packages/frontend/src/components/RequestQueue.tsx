@@ -8,15 +8,15 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
   const { requestQueue } = roomState;
 
   return (
-    <div className="w-full mx-10">
-      <div className="flex flex-row gap-4 ">
-        {requestQueue.length === 0 && <div>No requests in queue</div>}
+    <div className="w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4">
+      <div className="flex flex-row gap-2 sm:gap-4">
+        {requestQueue.length === 0 && <div className="text-fg-muted">No requests in queue</div>}
         {requestQueue.map((request, i) => (
-          <span key={request.createdAt} className="flex flex-col items-center gap-5 pt-4 pl-6">
-            <span className="text-md text-link font-semibold pr-6">{i + 1}</span>
-            <RequestQueueItem key={request.createdAt} request={request} />
-            <span className="text-md font-bold">{request.requesterId}</span>
-          </span>
+          <div key={request.createdAt} className="flex flex-col items-center gap-2 sm:gap-5 pt-4 pl-4 sm:pl-6 shrink-0">
+            <span className="text-sm sm:text-md text-link font-semibold pr-4 sm:pr-6">{i + 1}</span>
+            <RequestQueueItem request={request} />
+            <span className="text-xs sm:text-md font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterId}</span>
+          </div>
         ))}
       </div>
     </div>

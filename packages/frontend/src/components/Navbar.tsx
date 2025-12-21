@@ -13,7 +13,7 @@ export default function Navbar({ children }: NavbarProps) {
           <img src="/bitcoin_jukebox.png" alt="Mempool Band Logo" className="w-12 h-15" />
           <Link to="/" className="flex flex-col leading-none hover:opacity-80 transition-opacity">
             <span className="text-3xl font-bold text-white tracking-tight">mempool</span>
-            <span className="text-3xl font-bold text-title-purple tracking-tight">.band</span>
+            <span className="text-3xl font-bold text-title-purple tracking-tight">.music</span>
           </Link>
         </div>
 
