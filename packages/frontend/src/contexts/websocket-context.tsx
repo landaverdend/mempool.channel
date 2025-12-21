@@ -4,7 +4,6 @@ import {
   parseMessage,
   serializeMessage,
   Message,
-  RoomCreatedPayload,
   RoomClosedPayload,
   RoomErrorPayload,
   UserJoinedPayload,
@@ -113,7 +112,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
       case 'room-created':
       case 'room-joined': {
-        const payload = message.payload as RoomCreatedPayload;
+        const payload = message.payload as ClientRoomInfo;
         setRoomState({ ...payload });
         setRoomMessages([]);
         setError(null);
@@ -181,6 +180,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           loading: false,
           error: null,
         });
+        break;
+      }
+
+      case 'item-queued': {
+        const payload = message.payload as ClientRoomInfo;
+        setRoomState({ ...payload });
         break;
       }
 

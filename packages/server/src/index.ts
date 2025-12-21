@@ -13,8 +13,8 @@ import {
   RoomMessagePayload,
   RoomErrorType,
   CreateRoomPayload,
-  RoomCreatedPayload,
   MakeRequestPayload,
+  ClientRoomInfo,
 } from '@mempool/shared';
 import { createNWCClient } from './nostrClient.js';
 import { Room } from './types.js';
@@ -136,7 +136,7 @@ function handleUnsubscribe(ws: ExtendedWebSocket, payload: { channel: string }):
 }
 
 // Helper to build client room info from server Room
-function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
+function buildClientRoomInfo(room: Room, clientId: string): ClientRoomInfo {
   return {
     roomCode: room.code,
     isHost: room.hostId === clientId,
@@ -332,6 +332,7 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
       expiresAt,
       roomCode,
       requesterId: ws.clientId,
+      requesterUrl: payload.url,
     });
 
     const invoiceResponse = createMessage('invoice-generated', {
@@ -377,11 +378,26 @@ async function pollInvoices(roomCode: string): Promise<void> {
         payment_hash: pending.paymentHash,
       });
 
-      console.log('Lookup: ', lookup);
+      // If the invoice is paid, add the request to the queue and broadcast to the room
       if (lookup.settled_at) {
         // Invoice paid - remove from pending and notify room
         room.pendingInvoices.splice(i, 1);
         console.log(`Invoice paid: ${pending.paymentHash.substring(0, 8)}...`);
+
+        // Add to the request queue and broadcast to the room
+        room.requestQueue.push({
+          createdAt: Math.floor(Date.now() / 1000),
+          amount: pending.amount,
+          url: pending.requesterUrl,
+        });
+
+        // Sort the queue by amount in descending order
+        room.requestQueue.sort((a, b) => b.amount - a.amount);
+
+        // Broadcast the updated room info to the room.
+        const roomInfo = buildClientRoomInfo(room, pending.requesterId);
+        const queuedMessage = createMessage('item-queued', roomInfo);
+        broadcastToRoom(roomCode, 'item-queued', queuedMessage);
       }
     } catch (err) {
       // Log but don't remove - might be temporary error

@@ -10,6 +10,7 @@ export interface PendingInvoice {
   expiresAt: number;
   roomCode: string;
   requesterId: string; // client who requested the invoice
+  requesterUrl: string; // URL that the requester wants to queue
 }
 
 export interface Room {

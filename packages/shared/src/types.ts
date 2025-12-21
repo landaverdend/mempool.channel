@@ -81,10 +81,6 @@ export interface ClientRoomInfo {
   requestQueue: ClientRequest[];
 }
 
-// Room response payloads
-export type RoomCreatedPayload = ClientRoomInfo;
-export type RoomJoinedPayload = ClientRoomInfo;
-
 export interface RoomLeftPayload {
   roomCode: string;
 }
