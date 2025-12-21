@@ -10,7 +10,6 @@ export function createMessage(type: MessageType, payload: unknown): Message {
 }
 
 export function parseMessage(data: string): Message {
-
   const parsed = JSON.parse(data);
   if (isValidMessage(parsed)) {
     return parsed;
@@ -27,40 +26,12 @@ export function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
-const VALID_MESSAGE_TYPES = [
-  'ping',
-  'pong',
-  'subscribe',
-  'unsubscribe',
-  'data',
-  'create-room',
-  'join-room',
-  'leave-room',
-  'close-room',
-  'make-request',
-  'invoice-generated',
-  'invoice-error',
-  'room-message',
-  'room-created',
-  'room-joined',
-  'room-left',
-  'room-closed',
-  'room-error',
-  'user-joined',
-  'user-left',
-];
-
 export function isValidMessage(obj: unknown): obj is Message {
   if (typeof obj !== 'object' || obj === null) {
     return false;
   }
   const msg = obj as Record<string, unknown>;
-  return (
-    typeof msg.id === 'string' &&
-    typeof msg.type === 'string' &&
-    typeof msg.timestamp === 'number' &&
-    VALID_MESSAGE_TYPES.includes(msg.type as string)
-  );
+  return typeof msg.id === 'string' && typeof msg.type === 'string' && typeof msg.timestamp === 'number';
 }
 
 // Room code utilities

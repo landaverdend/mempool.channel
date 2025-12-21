@@ -118,6 +118,21 @@ export default function Room() {
           </button>
         </div>
 
+        {/* Request Queue */}
+        <div className="mb-4 p-4 bg-slate-800 rounded">
+          <h2 className="text-lg font-semibold">Request Queue</h2>
+          <ul className="space-y-2">
+            {roomState.requestQueue.map((request) => (
+              <li key={request.createdAt} className="text-sm">
+                <span className="font-mono text-xs">{request.requesterId}</span> spent {request.amount} to listen to{' '}
+                <a href={request.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
+                  {request.url}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 flex justify-between items-center">

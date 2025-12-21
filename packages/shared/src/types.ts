@@ -70,6 +70,7 @@ export interface ClientRequest {
   createdAt: number;
   amount: number;
   url: string;
+  requesterId: string;
 }
 
 // Shared room info sent to clients (subset of server Room)

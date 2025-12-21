@@ -389,15 +389,14 @@ async function pollInvoices(roomCode: string): Promise<void> {
           createdAt: Math.floor(Date.now() / 1000),
           amount: pending.amount,
           url: pending.requesterUrl,
+          requesterId: pending.requesterId,
         });
 
         // Sort the queue by amount in descending order
         room.requestQueue.sort((a, b) => b.amount - a.amount);
 
-        // Broadcast the updated room info to the room.
-        const roomInfo = buildClientRoomInfo(room, pending.requesterId);
-        const queuedMessage = createMessage('item-queued', roomInfo);
-        broadcastToRoom(roomCode, 'item-queued', queuedMessage);
+        // Broadcast the updated room info to the room
+        broadcastToRoom(roomCode, 'item-queued', buildClientRoomInfo(room, pending.requesterId));
       }
     } catch (err) {
       // Log but don't remove - might be temporary error

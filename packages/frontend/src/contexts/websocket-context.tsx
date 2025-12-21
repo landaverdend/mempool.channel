@@ -97,6 +97,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     const message = parseMessage(event.data);
+    console.log('message: ', message);
     if (!message) return;
 
     setMessages((prev) => [...prev, message]);
