@@ -1,5 +1,5 @@
 import { useWebSocket } from '@/contexts/websocket-context';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 interface InvoiceRequestModalProps {
   isOpen: boolean;

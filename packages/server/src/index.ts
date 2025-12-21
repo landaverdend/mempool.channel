@@ -138,6 +138,19 @@ function handleUnsubscribe(ws: ExtendedWebSocket, payload: { channel: string }):
   ws.send(serializeMessage(response));
 }
 
+// Helper to build client room info from server Room
+function buildClientRoomInfo(room: Room, clientId: string): RoomCreatedPayload {
+  return {
+    roomCode: room.code,
+    isHost: room.hostId === clientId,
+    members: room.members,
+    hostLightningAddress: room.hostLightningAddress,
+    // Convert millisats to sats
+    minSendable: Math.ceil(room.lnParams.minSendable),
+    maxSendable: Math.floor(room.lnParams.maxSendable),
+  };
+}
+
 // Room handlers
 async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayload): Promise<void> {
   // Check if client is already in a room
@@ -177,13 +190,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
   console.log(`Room created: ${roomCode} by ${ws.clientId}`);
 
   // Send confirmation to host
-  const response = createMessage('room-created', {
-    roomCode,
-    isHost: true,
-    hostLightningAddress: payload.lightningAddress,
-    maxSendable: lnParams.maxSendable,
-    minSendable: lnParams.minSendable,
-  } as RoomCreatedPayload);
+  const response = createMessage('room-created', buildClientRoomInfo(room, ws.clientId));
   ws.send(serializeMessage(response));
 }
 
@@ -216,12 +223,7 @@ function handleJoinRoom(ws: ExtendedWebSocket, payload: JoinRoomPayload): void {
   console.log(`Client ${ws.clientId} joined room ${roomCode}`);
 
   // Send join confirmation to new member
-  const joinResponse = createMessage('room-joined', {
-    roomCode,
-    isHost: room.hostId === ws.clientId,
-    members: room.members,
-    hostLightningAddress: room.hostLightningAddress,
-  } as RoomJoinedPayload);
+  const joinResponse = createMessage('room-joined', buildClientRoomInfo(room, ws.clientId));
   ws.send(serializeMessage(joinResponse));
 
   // Notify other room members

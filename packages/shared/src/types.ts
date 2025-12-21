@@ -74,24 +74,19 @@ export interface CreateRoomPayload {
   lightningAddress: string;
 }
 
-// Room response payloads
-export interface RoomCreatedPayload {
-  roomCode: string;
-  isHost: true;
-  hostLightningAddress: string;
-  minSendable: number;
-  maxSendable: number;
-}
-
-export interface RoomJoinedPayload {
+// Shared room info sent to clients (subset of server Room)
+export interface ClientRoomInfo {
   roomCode: string;
   isHost: boolean;
   members: string[];
   hostLightningAddress: string;
-
-  minSendable: number;
-  maxSendable: number;
+  minSendable: number; // in sats
+  maxSendable: number; // in sats
 }
+
+// Room response payloads
+export type RoomCreatedPayload = ClientRoomInfo;
+export type RoomJoinedPayload = ClientRoomInfo;
 
 export interface RoomLeftPayload {
   roomCode: string;
