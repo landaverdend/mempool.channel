@@ -30,10 +30,11 @@
   --color-primary: #007cfa;
   --color-secondary: #272f4e;
   --color-tertiary: #6225b2;
-
+  
   /* Brand / Title */
   --color-title: #2055e3;
   --color-link: #00ddff;
+  --color-title-purple: #9757ff;
 
   /* Status colors */
   --color-success: #0aab2f;
