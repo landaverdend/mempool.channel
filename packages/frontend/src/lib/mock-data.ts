@@ -17,20 +17,22 @@ const generateMockRequests = (clientIds: string[], count: number = 10) => {
 
 const members = ['client_abc123', 'client_def456', 'client_ghi789'];
 
+const currentlyPlaying = {
+  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  title: 'Rick Astley - Never Gonna Give You Up',
+  thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  startedAt: Date.now() - 60000,
+  requesterId: 'client_def456',
+  amount: 2100,
+};
+
 export const MOCK_ROOM_STATE: ClientRoomInfo = {
   roomCode: 'DEMO42',
   isHost: true,
   members: members,
-  currentlyPlaying: {
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    title: 'Rick Astley - Never Gonna Give You Up',
-    thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-    startedAt: Date.now() - 60000,
-    requesterId: 'client_def456',
-    amount: 2100,
-  },
-  requestQueue: [...generateMockRequests(members, 10)],
-  playedRequests: [...generateMockRequests(members, 10)],
+  currentlyPlaying: null,
+  requestQueue: [],
+  playedRequests: [],
 };
 
 export const MOCK_ROOM_MESSAGES: RoomMessage[] = [
@@ -56,5 +58,3 @@ export const MOCK_ROOM_MESSAGES: RoomMessage[] = [
     timestamp: Date.now() - 180000,
   },
 ];
-
-export const MOCK_INVOICE = 'lnbc21000n1pnxxx...mockInvoiceForDevMode...xxxEndOfMockInvoice';

@@ -11,8 +11,8 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
 
   return (
     <div className="w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4">
-      <div className="flex flex-row gap-3 sm:gap-4">
-        {isEmpty && <div className="text-fg-muted">No requests in queue</div>}
+      <div className="flex flex-row gap-3 sm:gap-4 justify-center">
+        {isEmpty && <div className="text-fg-muted text-3xl sm:text-4xl font-bold mt-4">No requests in queue</div>}
 
         {playedRequests.map((request, i) => (
           <RequestItem key={request.createdAt} request={request} isPlayed={true} index={i} />

@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import YouTube, { YouTubeEvent } from 'react-youtube';
 import { NowPlaying as NowPlayingType } from '@mempool/shared';
 import { useWebSocket } from '@/contexts/websocket-context';
+import SatsIcon from './SatsIcon';
 
 type NowPlayingProps = {
   currentlyPlaying: NowPlayingType | null;
@@ -61,7 +62,7 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
 
   if (!currentlyPlaying) {
     return (
-      <div className="bg-bg-box border border-border rounded-lg p-4 sm:p-6">
+      <div className="bg-bg-box rounded-sm p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-fg mb-1">Now Playing</h2>
@@ -82,7 +83,7 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
   const videoId = getYouTubeVideoId(currentlyPlaying.url);
 
   return (
-    <div className="bg-bg-box border border-border rounded-lg p-4 sm:p-6">
+    <div className="bg-bg-box rounded-sm p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-fg">Now Playing</h2>
         {isHost && (
@@ -145,9 +146,9 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
       )}
 
       <div className="flex items-center gap-4 text-sm text-fg-muted">
-        <span className="flex items-center gap-1">
+        <span className="flex items-center">
           <span className="font-medium text-fg">{currentlyPlaying.amount}</span>
-          <span>sats</span>
+          <SatsIcon className="w-5 h-5" />
         </span>
         <span>requested by {currentlyPlaying.requesterId}</span>
       </div>

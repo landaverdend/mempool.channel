@@ -15,7 +15,7 @@ import {
   InvoiceErrorPayload,
   ClientRoomInfo,
 } from '@mempool/shared';
-import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES, MOCK_INVOICE } from '@/lib/mock-data';
+import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES } from '@/lib/mock-data';
 
 // Dev mode: enable with ?dev query param or VITE_DEV_MODE env var
 const isDevMode = () => {
@@ -120,7 +120,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     const message = parseMessage(event.data);
-    console.log('message: ', message);
     if (!message) return;
 
     setMessages((prev) => [...prev, message]);
@@ -276,28 +275,21 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const makeRequest = useCallback(
     (requestPayload: MakeRequestPayload) => {
-      setInvoiceState({ invoice: null, loading: true, error: null });
       if (devMode) {
-        // Simulate invoice generation in dev mode
-        setTimeout(() => {
-          setInvoiceState({ invoice: MOCK_INVOICE, loading: false, error: null });
-          // Add to queue after "payment"
-          setTimeout(() => {
-            setRoomState((prev) => {
-              const newRequest = {
-                createdAt: Date.now(),
-                amount: requestPayload.amount,
-                url: requestPayload.url,
-                requesterId: clientId || 'dev_client',
-              };
-              // Insert in sorted order (highest amount first)
-              const newQueue = [...prev.requestQueue, newRequest].sort((a, b) => b.amount - a.amount);
-              return { ...prev, requestQueue: newQueue };
-            });
-          }, 1000);
-        }, 500);
+        // Dev mode: skip invoice, add directly to queue
+        setRoomState((prev) => {
+          const newRequest = {
+            createdAt: Date.now(),
+            amount: requestPayload.amount,
+            url: requestPayload.url,
+            requesterId: clientId || 'dev_client',
+          };
+          const newQueue = [...prev.requestQueue, newRequest].sort((a, b) => b.amount - a.amount);
+          return { ...prev, requestQueue: newQueue };
+        });
         return;
       }
+      setInvoiceState({ invoice: null, loading: true, error: null });
       sendMessage('make-request', requestPayload);
     },
     [sendMessage, devMode, clientId]

@@ -92,12 +92,16 @@ export default function Room() {
         />
 
         <div className="bg-bg-card rounded-sm p-4">
-          <h2 className="text-lg font-semibold">Request a Song</h2>
-        </div>
-
-        <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Song Queue</h2>
         </div>
+
+
+        <div className="bg-bg-card rounded-sm p-4">
+          <h2 className="text-lg font-semibold ">Request a Song</h2>
+
+          <div className=""></div>
+        </div>
+
 
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Chat</h2>
