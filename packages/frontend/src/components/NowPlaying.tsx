@@ -31,9 +31,9 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
 
   const handleVideoEnd = (event: YouTubeEvent) => {
     console.log('Video ended', event);
-    if (roomStateRef.current.requestQueue.length > 0) {
-      handlePlayNext();
-    }
+
+    // Send message to server to play next item in the queue
+    handlePlayNext();
   };
 
   if (!currentlyPlaying) {
