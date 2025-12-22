@@ -162,6 +162,21 @@ pre,
   transform-origin: top left;
 }
 
+/* Pending block pulsating animation */
+@keyframes block-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
+.block-3d-pending {
+  position: relative;
+  animation: block-pulse 2s ease-in-out infinite;
+}
+
 .block-3d-pending::before {
   content: '';
   position: absolute;
