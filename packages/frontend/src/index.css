@@ -97,6 +97,10 @@
     rgb(0, 125, 61) 85.7429%,
     rgb(0, 125, 61) 100%
   );
+
+  --gradient-block-current: repeating-linear-gradient(#9d7c05, #9d7c05 0.163525%, #d5a90a) !important;
+
+
 }
 
 /* Base styles */
@@ -164,13 +168,30 @@ pre,
 
 /* Pending block pulsating animation */
 @keyframes block-pulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: brightness(1);
   }
   50% {
     filter: brightness(1.25);
   }
 }
+
+/* Current block glowing animation (like mempool.space first block) */
+@keyframes block-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(213, 169, 10, 0.5))
+            drop-shadow(0 0 20px rgba(213, 169, 10, 0.3))
+            brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(213, 169, 10, 0.7))
+            drop-shadow(0 0 35px rgba(213, 169, 10, 0.5))
+            brightness(1.15);
+  }
+}
+
 
 .block-3d-pending {
   position: relative;
@@ -189,6 +210,34 @@ pre,
 }
 
 .block-3d-pending::after {
+  content: '';
+  position: absolute;
+  top: calc(-0.16 * var(--block-size));
+  left: calc(-0.16 * var(--block-size));
+  width: calc(0.16 * 125px);
+  height: var(--block-size);
+  background: #2d2520;
+  transform: skewY(45deg);
+  transform-origin: top left;
+}
+
+.block-3d-current {
+  position: relative;
+  animation: block-glow 2s ease-in-out infinite;
+}
+
+.block-3d-current::before {
+  content: '';
+  position: absolute;
+  top: calc(-0.16 * var(--block-size));
+  width: calc(var(--block-size) + 1px);
+  height: calc(0.16 * var(--block-size));
+  background: #403834;
+  transform: skewX(45deg);
+  transform-origin: bottom left;
+}
+
+.block-3d-current::after {
   content: '';
   position: absolute;
   top: calc(-0.16 * var(--block-size));

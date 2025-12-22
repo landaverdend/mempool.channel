@@ -1,12 +1,12 @@
 import { useRef, useEffect } from 'react';
 import YouTube, { YouTubeEvent } from 'react-youtube';
-import { NowPlaying as NowPlayingType } from '@mempool/shared';
+import { ClientRequest } from '@mempool/shared';
 import { useWebSocket } from '@/contexts/websocket-context';
 import SatsIcon from './SatsIcon';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 
 type NowPlayingProps = {
-  currentlyPlaying: NowPlayingType | null;
+  currentlyPlaying: ClientRequest | null;
   isHost: boolean;
   hasQueue: boolean;
 };

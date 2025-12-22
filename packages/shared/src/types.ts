@@ -78,21 +78,13 @@ export interface ClientRequest {
   requesterId: string;
 }
 
-// Currently playing song info
-export interface NowPlaying {
-  url: string;
-  startedAt: number;
-  requesterId: string;
-  amount: number;
-}
-
 // Shared room info sent to clients (subset of server Room)
 export interface ClientRoomInfo {
   roomCode: string;
   isHost: boolean;
   members: string[];
 
-  currentlyPlaying: NowPlaying | null;
+  currentlyPlaying: ClientRequest | null;
   playedRequests: ClientRequest[];
   requestQueue: ClientRequest[];
 }
@@ -170,5 +162,5 @@ export interface SkipCurrentPayload {
 
 export interface NowPlayingPayload {
   roomCode: string;
-  nowPlaying: NowPlaying | null;
+  nowPlaying: ClientRequest | null;
 }

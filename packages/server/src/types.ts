@@ -1,4 +1,4 @@
-import { ClientRequest, NowPlaying } from '@mempool/shared';
+import { ClientRequest } from '@mempool/shared';
 import { NWCClient } from '@getalby/sdk';
 
 export interface PendingInvoice {
@@ -19,7 +19,7 @@ export interface Room {
   members: string[];
   createdAt: number;
 
-  currentlyPlaying: NowPlaying | null;
+  currentlyPlaying: ClientRequest | null;
   requestQueue: ClientRequest[];
   playedRequests: ClientRequest[];
 

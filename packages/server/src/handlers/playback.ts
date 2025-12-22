@@ -21,10 +21,7 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   // Move current song to played if exists
   if (room.currentlyPlaying) {
     roomManager.addToPlayedRequests(roomCode, {
-      createdAt: room.currentlyPlaying.startedAt,
-      amount: room.currentlyPlaying.amount,
-      url: room.currentlyPlaying.url,
-      requesterId: room.currentlyPlaying.requesterId,
+      ...room.currentlyPlaying,
     });
   }
 
@@ -33,12 +30,7 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   if (!nextRequest) {
     roomManager.setCurrentlyPlaying(roomCode, null);
   } else {
-    roomManager.setCurrentlyPlaying(roomCode, {
-      url: nextRequest.url,
-      startedAt: Date.now(),
-      requesterId: nextRequest.requesterId,
-      amount: nextRequest.amount,
-    });
+    roomManager.setCurrentlyPlaying(roomCode, nextRequest);
   }
 
   const updatedRoom = roomManager.get(roomCode);
@@ -73,12 +65,7 @@ export const handleSkipCurrent: Handler<SkipCurrentPayload> = (ws, payload, ctx)
 
   // Move current song to played if exists
   if (room.currentlyPlaying) {
-    roomManager.addToPlayedRequests(roomCode, {
-      createdAt: room.currentlyPlaying.startedAt,
-      amount: room.currentlyPlaying.amount,
-      url: room.currentlyPlaying.url,
-      requesterId: room.currentlyPlaying.requesterId,
-    });
+    roomManager.addToPlayedRequests(roomCode, room.currentlyPlaying);
     roomManager.setCurrentlyPlaying(roomCode, null);
   }
 

@@ -79,12 +79,7 @@ export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx)
 
   // If nothing is currently playing, set the new request as the currently playing item. Don't add to queue
   if (room.currentlyPlaying === null) {
-    roomManager.setCurrentlyPlaying(roomCode, {
-      url: request.url,
-      startedAt: Date.now(),
-      requesterId: request.requesterId,
-      amount: request.amount,
-    });
+    roomManager.setCurrentlyPlaying(roomCode, request);
   } else {
     roomManager.addToQueue(roomCode, request);
   }
