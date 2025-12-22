@@ -77,8 +77,7 @@ interface WebSocketContextValue {
   sendRoomMessage: (content: string) => void;
 
   // Playback actions (host only)
-  playNext: (title: string, thumbnail: string) => void;
-  skipCurrent: () => void;
+  playNext: () => void;
   addRequest: (url: string, amount: number) => void; // Debug / Host only
 
   // Utility actions
@@ -353,24 +352,18 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     [sendMessage, roomState.roomCode, devMode, clientId, roomState.isHost]
   );
 
-  const playNext = useCallback(
-    (title: string, thumbnail: string) => {
-      if (!roomState.roomCode || !roomState.isHost) return;
-      sendMessage('play-next', { roomCode: roomState.roomCode, title, thumbnail });
-    },
-    [sendMessage, roomState.roomCode, roomState.isHost]
-  );
-
-  const skipCurrent = useCallback(() => {
+  const playNext = useCallback(() => {
+    console.log('calling playNext clientside ', roomState.roomCode);
     if (!roomState.roomCode || !roomState.isHost) return;
-    sendMessage('skip-current', { roomCode: roomState.roomCode });
+
+    sendMessage('play-next', { roomCode: roomState.roomCode });
   }, [sendMessage, roomState.roomCode, roomState.isHost]);
 
   const addRequest = useCallback(
     (url: string, amount: number) => {
       if (!roomState.roomCode || !roomState.isHost) return;
 
-      sendMessage('add-request', { roomCode: roomState.roomCode, url, amount });
+      sendMessage('host-request', { roomCode: roomState.roomCode, url, amount });
     },
     [sendMessage, roomState.roomCode, roomState.isHost]
   );
@@ -407,7 +400,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     closeRoom,
     sendRoomMessage,
     playNext,
-    skipCurrent,
     clearError,
     clearInvoice,
   };

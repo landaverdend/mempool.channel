@@ -54,7 +54,8 @@ export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload
   }
 };
 
-export const handleAddRequest: Handler<MakeRequestPayload> = (ws, payload, ctx) => {
+// Host Only Upload - Maybe dont
+export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx) => {
   const { roomManager } = ctx;
   const roomCode = normalizeRoomCode(payload.roomCode || '');
 
@@ -76,18 +77,16 @@ export const handleAddRequest: Handler<MakeRequestPayload> = (ws, payload, ctx) 
     requesterId: ws.clientId,
   };
 
-  roomManager.addToQueue(roomCode, request);
-
-  // Auto-start playing if nothing is playing
+  // If nothing is currently playing, set the new request as the currently playing item. Don't add to queue
   if (room.currentlyPlaying === null) {
     roomManager.setCurrentlyPlaying(roomCode, {
       url: request.url,
-      title: '',
-      thumbnail: '',
       startedAt: Date.now(),
       requesterId: request.requesterId,
       amount: request.amount,
     });
+  } else {
+    roomManager.addToQueue(roomCode, request);
   }
 
   const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId);

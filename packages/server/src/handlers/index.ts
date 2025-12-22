@@ -1,7 +1,7 @@
 import type { Handler } from './types.js';
 import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleRoomMessage } from './room.js';
 import { handlePlayNext, handleSkipCurrent } from './playback.js';
-import { handleMakeRequest, handleAddRequest } from './requests.js';
+import { handleMakeRequest, handleHostRequest } from './requests.js';
 
 // Handler map - maps message types to their handlers
 export const handlers: Record<string, Handler> = {
@@ -11,9 +11,8 @@ export const handlers: Record<string, Handler> = {
   'close-room': handleCloseRoom,
   'room-message': handleRoomMessage,
   'play-next': handlePlayNext,
-  'skip-current': handleSkipCurrent,
   'make-request': handleMakeRequest,
-  'add-request': handleAddRequest,
+  'host-request': handleHostRequest,
 };
 
 export type { Handler, HandlerContext } from './types.js';

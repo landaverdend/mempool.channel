@@ -27,9 +27,8 @@ export type MessageType =
 
   // Playback control (host only)
   | 'play-next'
-  | 'skip-current'
   | 'now-playing'
-  | 'add-request' // Debug / Host only
+  | 'host-request' // Debug / Host only
 
   // Room response types
   | 'room-created'
@@ -82,8 +81,6 @@ export interface ClientRequest {
 // Currently playing song info
 export interface NowPlaying {
   url: string;
-  title: string;
-  thumbnail: string;
   startedAt: number;
   requesterId: string;
   amount: number;
@@ -163,11 +160,8 @@ export interface InvoiceErrorPayload {
   roomCode: string;
 }
 
-// Playback control payloads
 export interface PlayNextPayload {
   roomCode: string;
-  title: string;
-  thumbnail: string;
 }
 
 export interface SkipCurrentPayload {

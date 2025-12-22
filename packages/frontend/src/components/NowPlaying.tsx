@@ -3,6 +3,7 @@ import YouTube, { YouTubeEvent } from 'react-youtube';
 import { NowPlaying as NowPlayingType } from '@mempool/shared';
 import { useWebSocket } from '@/contexts/websocket-context';
 import SatsIcon from './SatsIcon';
+import { getYouTubeVideoId } from '@/lib/yt-utils';
 
 type NowPlayingProps = {
   currentlyPlaying: NowPlayingType | null;
@@ -10,53 +11,28 @@ type NowPlayingProps = {
   hasQueue: boolean;
 };
 
-// Extract YouTube video ID from various URL formats
-function getYouTubeVideoId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /youtube\.com\/shorts\/([^&\n?#]+)/,
-  ];
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
-}
-
 export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPlayingProps) {
-  const { playNext, skipCurrent, roomState } = useWebSocket();
+  const { playNext, roomState } = useWebSocket();
 
   // Use refs to get latest values in callbacks
   const roomStateRef = useRef(roomState);
   const playNextRef = useRef(playNext);
-  const skipCurrentRef = useRef(skipCurrent);
 
   useEffect(() => {
+    console.log('roomState changed ', roomState);
     roomStateRef.current = roomState;
     playNextRef.current = playNext;
-    skipCurrentRef.current = skipCurrent;
-  }, [roomState, playNext, skipCurrent]);
+  }, [roomState, playNext]);
 
   const handlePlayNext = () => {
-    const nextRequest = roomStateRef.current.requestQueue[0];
-    console.log('handlePlayNext ', nextRequest);
-
-    if (nextRequest) {
-      const videoId = getYouTubeVideoId(nextRequest.url);
-      playNextRef.current(nextRequest.url, videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '');
-    }
-  };
-
-  const handleSkip = () => {
-    skipCurrentRef.current();
+    // Send message to server to play next item in the queue
+    playNextRef.current();
   };
 
   const handleVideoEnd = (event: YouTubeEvent) => {
     console.log('Video ended', event);
     if (roomStateRef.current.requestQueue.length > 0) {
       handlePlayNext();
-    } else {
-      skipCurrentRef.current();
     }
   };
 
@@ -95,11 +71,6 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
                 Next
               </button>
             )}
-            <button
-              onClick={handleSkip}
-              className="px-3 py-1.5 bg-secondary text-fg rounded text-sm font-medium hover:bg-border transition-colors cursor-pointer">
-              Skip
-            </button>
           </div>
         )}
       </div>
@@ -127,13 +98,13 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
         <div className="flex gap-4 mb-4">
           <div className="shrink-0">
             <img
-              src={currentlyPlaying.thumbnail}
-              alt={currentlyPlaying.title}
+              src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+              alt={currentlyPlaying.url}
               className="w-32 h-24 sm:w-40 sm:h-30 object-cover rounded"
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-center">
-            <h3 className="font-medium text-fg text-lg">{currentlyPlaying.title}</h3>
+            <h3 className="font-medium text-fg text-lg">{currentlyPlaying.url}</h3>
             <a
               href={currentlyPlaying.url}
               target="_blank"

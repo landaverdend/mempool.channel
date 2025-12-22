@@ -1,4 +1,4 @@
-import { PlayNextPayload, SkipCurrentPayload, normalizeRoomCode } from '@mempool/shared';
+import { PlayNextPayload, SkipCurrentPayload, createMessage, normalizeRoomCode, serializeMessage } from '@mempool/shared';
 import { Handler } from './types.js';
 
 export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
@@ -6,6 +6,7 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   const roomCode = normalizeRoomCode(payload.roomCode || '');
 
   const room = roomManager.get(roomCode);
+  // Check room exists
   if (!room) {
     ctx.sendError(ws, 'room_not_found', 'Room not found.', roomCode);
     return;
@@ -34,8 +35,6 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   } else {
     roomManager.setCurrentlyPlaying(roomCode, {
       url: nextRequest.url,
-      title: payload.title,
-      thumbnail: payload.thumbnail,
       startedAt: Date.now(),
       requesterId: nextRequest.requesterId,
       amount: nextRequest.amount,
@@ -43,17 +42,15 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   }
 
   const updatedRoom = roomManager.get(roomCode);
-  console.log(`Now playing in ${roomCode}: ${updatedRoom?.currentlyPlaying?.title || 'nothing'}`);
+  console.log(`Now playing in ${roomCode}: ${updatedRoom?.currentlyPlaying?.url || 'nothing'}`);
 
   // Broadcast updated state to all room members
   const members = roomManager.getMembers(roomCode);
   members.forEach((memberId) => {
     const clientInfo = roomManager.buildClientInfo(roomCode, memberId);
     if (clientInfo) {
-      clientManager.send(
-        memberId,
-        JSON.stringify({ type: 'now-playing', payload: clientInfo })
-      );
+      const message = createMessage('now-playing', clientInfo);
+      clientManager.send(memberId, serializeMessage(message));
     }
   });
 };
@@ -91,11 +88,9 @@ export const handleSkipCurrent: Handler<SkipCurrentPayload> = (ws, payload, ctx)
   const members = roomManager.getMembers(roomCode);
   members.forEach((memberId) => {
     const clientInfo = roomManager.buildClientInfo(roomCode, memberId);
+    const message = createMessage('now-playing', clientInfo);
     if (clientInfo) {
-      clientManager.send(
-        memberId,
-        JSON.stringify({ type: 'now-playing', payload: clientInfo })
-      );
+      clientManager.send(memberId, serializeMessage(message));
     }
   });
 };
