@@ -1,5 +1,6 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
 import { useMemo } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 import SatsIcon from './SatsIcon';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 
@@ -55,6 +56,7 @@ function RequestBlock({ request, type }: RequestItemProps) {
   const { getMetadata } = useYoutubeMetadata();
 
   const createdAt = useMemo(() => new Date(request.createdAt).toLocaleTimeString(), [request.createdAt]);
+  const exactTime = useMemo(() => new Date(request.createdAt).toLocaleString(), [request.createdAt]);
   const metadata = getMetadata(request.url);
 
   const title = metadata?.title ?? '';
@@ -71,17 +73,68 @@ function RequestBlock({ request, type }: RequestItemProps) {
   }, [type]);
 
   return (
-    <div
-      className={`relative ${blockClass} w-(--block-size) h-(--block-size) flex flex-col items-center justify-center`}
-      style={{ background: blockGradient }}>
-      <span className={`font-semibold text-xs truncate max-w-[100px] ${type === 'current' ? 'text-white' : 'text-yellow'}`}>
-        {title}
-      </span>
-      <div className="font-bold flex items-center gap-1 text-2xl">
-        {request.amount}
-        <SatsIcon />
-      </div>
-      <div className="text-md">{createdAt}</div>
-    </div>
+    <Popover.Root>
+      <Popover.Trigger asChild>
+        <div
+          className={`relative ${blockClass} w-(--block-size) h-(--block-size) flex flex-col items-center justify-center cursor-pointer`}
+          style={{ background: blockGradient }}>
+          <span className={`font-semibold text-xs truncate max-w-[100px] ${type === 'current' ? 'text-white' : 'text-yellow'}`}>
+            {title}
+          </span>
+          <div className="font-bold flex items-center gap-1 text-2xl">
+            {request.amount}
+            <SatsIcon />
+          </div>
+          <div className="text-md">{createdAt}</div>
+        </div>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          className="bg-bg-box border border-border rounded-lg p-4 w-80 shadow-xl z-50 focus:outline-none"
+          sideOffset={8}>
+          {/* Video Info */}
+          {metadata && (
+            <div className="mb-4">
+              <a href={request.url} target="_blank" rel="noopener noreferrer" className="block">
+                <img
+                  src={metadata.thumbnailUrl}
+                  alt={metadata.title}
+                  className="w-full rounded-md mb-2 hover:opacity-90 transition-opacity"
+                />
+              </a>
+              <a
+                href={request.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-link hover:underline font-semibold text-sm line-clamp-2">
+                {metadata.title}
+              </a>
+              <p className="text-fg-muted text-xs mt-1">{metadata.author}</p>
+            </div>
+          )}
+
+          {/* Request Info */}
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-fg-muted">Amount</span>
+              <span className="font-bold flex items-center gap-1">
+                {request.amount}
+                <SatsIcon width={14} height={14} />
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-fg-muted">Requested by</span>
+              <span className="font-medium">{request.requesterId}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-fg-muted">Time</span>
+              <span className="font-medium">{exactTime}</span>
+            </div>
+          </div>
+
+          <Popover.Arrow className="fill-bg-box" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

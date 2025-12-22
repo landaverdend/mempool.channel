@@ -2,14 +2,16 @@ import { cn } from '@/lib/utils';
 
 type SatsIconProps = {
   className?: string;
+  width?: number;
+  height?: number;
 };
 
-export default function SatsIcon({ className }: SatsIconProps) {
+export default function SatsIcon({ className, width = 24, height = 24 }: SatsIconProps) {
   return (
     <svg
       className={cn('-skew-x-10', className)}
-      width="24px"
-      height="24px"
+      width={width}
+      height={height}
       viewBox="0 0 24 24"
       fill="white"
       xmlns="http://www.w3.org/2000/svg">
