@@ -25,6 +25,11 @@ export type MessageType =
   | 'room-message'
   | 'item-queued'
 
+  // Playback control (host only)
+  | 'play-next'
+  | 'skip-current'
+  | 'now-playing'
+
   // Room response types
   | 'room-created'
   | 'room-joined'
@@ -73,12 +78,23 @@ export interface ClientRequest {
   requesterId: string;
 }
 
+// Currently playing song info
+export interface NowPlaying {
+  url: string;
+  title: string;
+  thumbnail: string;
+  startedAt: number;
+  requesterId: string;
+  amount: number;
+}
+
 // Shared room info sent to clients (subset of server Room)
 export interface ClientRoomInfo {
   roomCode: string;
   isHost: boolean;
   members: string[];
 
+  currentlyPlaying: NowPlaying | null;
   playedRequests: ClientRequest[];
   requestQueue: ClientRequest[];
 }
@@ -144,4 +160,20 @@ export interface InvoiceGeneratedPayload {
 export interface InvoiceErrorPayload {
   error: string;
   roomCode: string;
+}
+
+// Playback control payloads
+export interface PlayNextPayload {
+  roomCode: string;
+  title: string;
+  thumbnail: string;
+}
+
+export interface SkipCurrentPayload {
+  roomCode: string;
+}
+
+export interface NowPlayingPayload {
+  roomCode: string;
+  nowPlaying: NowPlaying | null;
 }

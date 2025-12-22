@@ -11,7 +11,8 @@ const generateMockRequests = (clientIds: string[], count: number = 10) => {
       requesterId: clientIds[i % clientIds.length],
     });
   }
-  return requests;
+  // Sort by amount descending - highest paying requests first
+  return requests.sort((a, b) => b.amount - a.amount);
 };
 
 const members = ['client_abc123', 'client_def456', 'client_ghi789'];
@@ -20,6 +21,14 @@ export const MOCK_ROOM_STATE: ClientRoomInfo = {
   roomCode: 'DEMO42',
   isHost: true,
   members: members,
+  currentlyPlaying: {
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    title: 'Rick Astley - Never Gonna Give You Up',
+    thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+    startedAt: Date.now() - 60000,
+    requesterId: 'client_def456',
+    amount: 2100,
+  },
   requestQueue: [...generateMockRequests(members, 10)],
   playedRequests: [...generateMockRequests(members, 10)],
 };

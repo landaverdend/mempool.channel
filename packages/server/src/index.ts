@@ -14,6 +14,8 @@ import {
   RoomErrorType,
   CreateRoomPayload,
   MakeRequestPayload,
+  PlayNextPayload,
+  SkipCurrentPayload,
   ClientRoomInfo,
   ClientRequest,
 } from '@mempool/shared';
@@ -112,6 +114,14 @@ wss.on('connection', (ws: WebSocket) => {
         handleMakeRequest(extWs, message.payload as MakeRequestPayload);
         break;
 
+      case 'play-next':
+        handlePlayNext(extWs, message.payload as PlayNextPayload);
+        break;
+
+      case 'skip-current':
+        handleSkipCurrent(extWs, message.payload as SkipCurrentPayload);
+        break;
+
       default:
         console.log(`Unhandled message type: ${message.type}`);
     }
@@ -158,6 +168,7 @@ function buildClientRoomInfo(room: Room, clientId: string): ClientRoomInfo {
     isHost: room.hostId === clientId,
     members: room.members,
 
+    currentlyPlaying: room.currentlyPlaying,
     playedRequests: room.playedRequests,
     requestQueue: room.requestQueue,
   };
@@ -193,6 +204,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     hostId: ws.clientId,
     members: [ws.clientId],
     createdAt: Date.now(),
+    currentlyPlaying: null,
     requestQueue: generateTestQueue(ws.clientId),
     pendingInvoices: [],
     playedRequests: [],
@@ -369,6 +381,96 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
     sendError(ws, 'invoice_error', 'Failed to create invoice.', roomCode);
     return;
   }
+}
+
+function handlePlayNext(ws: ExtendedWebSocket, payload: PlayNextPayload): void {
+  const roomCode = normalizeRoomCode(payload.roomCode || '');
+
+  const room = rooms.get(roomCode);
+  if (!room) {
+    sendError(ws, 'room_not_found', 'Room not found.', roomCode);
+    return;
+  }
+
+  // Only host can control playback
+  if (room.hostId !== ws.clientId) {
+    sendError(ws, 'not_host', 'Only the host can control playback.', roomCode);
+    return;
+  }
+
+  // Move current song to played if exists
+  if (room.currentlyPlaying) {
+    room.playedRequests.push({
+      createdAt: room.currentlyPlaying.startedAt,
+      amount: room.currentlyPlaying.amount,
+      url: room.currentlyPlaying.url,
+      requesterId: room.currentlyPlaying.requesterId,
+    });
+  }
+
+  // Get next from queue
+  const nextRequest = room.requestQueue.shift();
+  if (!nextRequest) {
+    room.currentlyPlaying = null;
+  } else {
+    room.currentlyPlaying = {
+      url: nextRequest.url,
+      title: payload.title,
+      thumbnail: payload.thumbnail,
+      startedAt: Date.now(),
+      requesterId: nextRequest.requesterId,
+      amount: nextRequest.amount,
+    };
+  }
+
+  console.log(`Now playing in ${roomCode}: ${room.currentlyPlaying?.title || 'nothing'}`);
+
+  // Broadcast updated state to all room members
+  room.members.forEach((memberId) => {
+    const memberWs = clients.get(memberId);
+    if (memberWs && memberWs.readyState === WebSocket.OPEN) {
+      const response = createMessage('now-playing', buildClientRoomInfo(room, memberId));
+      memberWs.send(serializeMessage(response));
+    }
+  });
+}
+
+function handleSkipCurrent(ws: ExtendedWebSocket, payload: SkipCurrentPayload): void {
+  const roomCode = normalizeRoomCode(payload.roomCode || '');
+
+  const room = rooms.get(roomCode);
+  if (!room) {
+    sendError(ws, 'room_not_found', 'Room not found.', roomCode);
+    return;
+  }
+
+  // Only host can control playback
+  if (room.hostId !== ws.clientId) {
+    sendError(ws, 'not_host', 'Only the host can control playback.', roomCode);
+    return;
+  }
+
+  // Move current song to played if exists
+  if (room.currentlyPlaying) {
+    room.playedRequests.push({
+      createdAt: room.currentlyPlaying.startedAt,
+      amount: room.currentlyPlaying.amount,
+      url: room.currentlyPlaying.url,
+      requesterId: room.currentlyPlaying.requesterId,
+    });
+    room.currentlyPlaying = null;
+  }
+
+  console.log(`Skipped current song in ${roomCode}`);
+
+  // Broadcast updated state to all room members
+  room.members.forEach((memberId) => {
+    const memberWs = clients.get(memberId);
+    if (memberWs && memberWs.readyState === WebSocket.OPEN) {
+      const response = createMessage('now-playing', buildClientRoomInfo(room, memberId));
+      memberWs.send(serializeMessage(response));
+    }
+  });
 }
 
 async function pollInvoices(roomCode: string): Promise<void> {

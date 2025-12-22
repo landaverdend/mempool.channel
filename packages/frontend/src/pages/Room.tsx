@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { QRCodeSVG } from 'qrcode.react';
 import { useWebSocket } from '../contexts/websocket-context';
 import InvoiceRequestModal from '../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/components/RoomHeader';
+import NowPlaying from '@/components/NowPlaying';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
-  const { connected, roomState, roomMessages, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } =
+  const { connected, roomState, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } =
     useWebSocket();
 
   const [messageInput, setMessageInput] = useState('');
@@ -74,7 +74,7 @@ export default function Room() {
 
       <RequestQueue roomState={roomState} />
 
-      <div className="max-w-3xl mx-auto p-8">
+      <div className="max-w-3xl mx-auto p-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 flex justify-between items-center">
@@ -85,8 +85,26 @@ export default function Room() {
           </div>
         )}
 
+        <NowPlaying
+          currentlyPlaying={roomState.currentlyPlaying}
+          isHost={roomState.isHost}
+          hasQueue={roomState.requestQueue.length > 0}
+        />
+
+        <div className="bg-bg-card rounded-sm p-4">
+          <h2 className="text-lg font-semibold">Request a Song</h2>
+        </div>
+
+        <div className="bg-bg-card rounded-sm p-4">
+          <h2 className="text-lg font-semibold ">Song Queue</h2>
+        </div>
+
+        <div className="bg-bg-card rounded-sm p-4">
+          <h2 className="text-lg font-semibold ">Chat</h2>
+        </div>
+
         {/* Invoice Request */}
-        <div className="mb-4 p-4 bg-slate-800 rounded">
+        {/* <div className="mb-4 p-4 bg-slate-800 rounded">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Request Payment</h2>
             <button
@@ -118,10 +136,10 @@ export default function Room() {
           {invoiceState.error && (
             <div className="mt-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200">{invoiceState.error}</div>
           )}
-        </div>
+        </div> */}
 
         {/* Room Chat */}
-        <div className="p-4 bg-slate-800 rounded">
+        {/* <div className="p-4 bg-slate-800 rounded">
           <h2 className="text-lg font-semibold mb-3">Chat</h2>
           <div className="bg-slate-700 rounded p-3 mb-3">
             <ul className="max-h-64 overflow-y-auto space-y-2">
@@ -157,7 +175,7 @@ export default function Room() {
               Send
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Invoice Request Modal */}
