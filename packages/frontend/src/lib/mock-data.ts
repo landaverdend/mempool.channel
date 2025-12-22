@@ -20,7 +20,8 @@ export const MOCK_ROOM_STATE: ClientRoomInfo = {
   roomCode: 'DEMO42',
   isHost: true,
   members: members,
-  requestQueue: [...generateMockRequests(members, 100)],
+  requestQueue: [...generateMockRequests(members, 10)],
+  playedRequests: [...generateMockRequests(members, 10)],
 };
 
 export const MOCK_ROOM_MESSAGES: RoomMessage[] = [

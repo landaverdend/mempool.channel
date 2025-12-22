@@ -79,6 +79,7 @@ export interface ClientRoomInfo {
   isHost: boolean;
   members: string[];
 
+  playedRequests: ClientRequest[];
   requestQueue: ClientRequest[];
 }
 

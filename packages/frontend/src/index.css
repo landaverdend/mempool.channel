@@ -50,13 +50,6 @@
   /* Block gradient */
   --color-mainnet-alt: #4a1a8c;
 
-  --gradient-block: repeating-linear-gradient(
-    var(--color-secondary),
-    var(--color-secondary) 0.1564249999999987%,
-    var(--color-mainnet-alt) 0.1564249999999987%,
-    var(--color-primary) 100%
-  );
-
   /* Taproot accent */
   --color-taproot: #eba814;
   --color-taproot-light: #d5a90a;
@@ -77,6 +70,33 @@
 
   /* Border */
   --color-border: #20263e;
+
+  --gradient-block-played: repeating-linear-gradient(
+    var(--color-secondary),
+    var(--color-secondary) 0.1564249999999987%,
+    var(--color-mainnet-alt) 0.1564249999999987%,
+    var(--color-primary) 100%
+  );
+
+  --gradient-block-pending: repeating-linear-gradient(
+    to right,
+    rgb(85, 75, 69),
+    rgb(85, 75, 69) 0.2005%,
+    rgb(0, 125, 61) 0.2005%,
+    rgb(0, 125, 61) 14.1724%,
+    rgb(0, 125, 61) 14.4576%,
+    rgb(0, 125, 61) 29.1424%,
+    rgb(0, 125, 61) 28.7146%,
+    rgb(0, 125, 61) 43.1143%,
+    rgb(0, 125, 61) 42.9717%,
+    rgb(0, 125, 61) 57.0862%,
+    rgb(0, 125, 61) 57.2288%,
+    rgb(0, 125, 61) 71.0581%,
+    rgb(0, 125, 61) 71.4859%,
+    rgb(0, 125, 61) 86.0281%,
+    rgb(0, 125, 61) 85.7429%,
+    rgb(0, 125, 61) 100%
+  );
 }
 
 /* Base styles */
@@ -119,12 +139,7 @@ pre,
   display: none;
 }
 
-/* 3D Block effect */
-.block-3d {
-  position: relative;
-}
-
-.block-3d::before {
+.block-3d-played::before {
   content: '';
   position: absolute;
   top: calc(-0.16 * var(--block-size));
@@ -135,7 +150,7 @@ pre,
   transform-origin: bottom left;
 }
 
-.block-3d::after {
+.block-3d-played::after {
   content: '';
   position: absolute;
   top: calc(-0.16 * var(--block-size));
@@ -143,6 +158,29 @@ pre,
   width: calc(0.16 * 125px);
   height: var(--block-size);
   background: #191c27;
+  transform: skewY(45deg);
+  transform-origin: top left;
+}
+
+.block-3d-pending::before {
+  content: '';
+  position: absolute;
+  top: calc(-0.16 * var(--block-size));
+  width: calc(var(--block-size) + 1px);
+  height: calc(0.16 * var(--block-size));
+  background: #403834;
+  transform: skewX(45deg);
+  transform-origin: bottom left;
+}
+
+.block-3d-pending::after {
+  content: '';
+  position: absolute;
+  top: calc(-0.16 * var(--block-size));
+  left: calc(-0.16 * var(--block-size));
+  width: calc(0.16 * 125px);
+  height: var(--block-size);
+  background: #2d2520;
   transform: skewY(45deg);
   transform-origin: top left;
 }

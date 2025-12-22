@@ -158,6 +158,7 @@ function buildClientRoomInfo(room: Room, clientId: string): ClientRoomInfo {
     isHost: room.hostId === clientId,
     members: room.members,
 
+    playedRequests: room.playedRequests,
     requestQueue: room.requestQueue,
   };
 }
@@ -194,6 +195,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     createdAt: Date.now(),
     requestQueue: generateTestQueue(ws.clientId),
     pendingInvoices: [],
+    playedRequests: [],
     nwcClient,
   };
 

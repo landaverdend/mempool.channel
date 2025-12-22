@@ -5,31 +5,54 @@ type RequestQueueProps = {
   roomState: ClientRoomInfo;
 };
 export function RequestQueue({ roomState }: RequestQueueProps) {
-  const { requestQueue } = roomState;
+  const { requestQueue, playedRequests } = roomState;
+
+  const isEmpty = requestQueue.length === 0 && playedRequests.length === 0;
 
   return (
     <div className="w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4">
       <div className="flex flex-row gap-3 sm:gap-4">
-        {requestQueue.length === 0 && <div className="text-fg-muted">No requests in queue</div>}
+        {isEmpty && <div className="text-fg-muted">No requests in queue</div>}
+
+        {playedRequests.map((request, i) => (
+          <RequestItem key={request.createdAt} request={request} isPlayed={true} index={i} />
+        ))}
+
         {requestQueue.map((request, i) => (
-          <div key={request.createdAt} className="flex flex-col items-center gap-7 pt-4 pl-4 sm:pl-6 shrink-0">
-            <span className="text-md sm:text-lg text-link font-semibold pr-4 sm:pr-6">{i + 1}</span>
-            <RequestQueueItem request={request} />
-            <span className="text-xs sm:text-lg font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterId}</span>
-          </div>
+          <RequestItem key={request.createdAt} request={request} isPlayed={false} index={i} />
         ))}
       </div>
     </div>
   );
 }
 
-function RequestQueueItem({ request }: { request: ClientRequest }) {
+type RequestItemProps = {
+  request: ClientRequest;
+  isPlayed: boolean;
+  index: number;
+};
+
+function RequestItem({ request, isPlayed, index }: RequestItemProps) {
+  return (
+    <div className="flex flex-col items-center gap-7 pt-4 pl-4 sm:pl-6 shrink-0">
+      <span className={`text-md sm:text-lg text-link font-semibold pr-4 sm:pr-6  ${isPlayed ? 'visible' : 'invisible'}`}>
+        {index + 1}
+      </span>
+      <RequestBlock request={request} isPlayed={isPlayed} index={index} />
+      <span className="text-xs sm:text-lg font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterId}</span>
+    </div>
+  );
+}
+
+function RequestBlock({ request, isPlayed }: RequestItemProps) {
   const createdAt = useMemo(() => new Date(request.createdAt).toLocaleTimeString(), [request.createdAt]);
 
   return (
     <div
-      className="block-3d w-(--block-size) h-(--block-size) flex flex-col items-center justify-center"
-      style={{ background: 'var(--gradient-block)' }}>
+      className={`relative ${
+        isPlayed ? 'block-3d-played ' : 'block-3d-pending '
+      } w-(--block-size) h-(--block-size) flex flex-col items-center justify-center`}
+      style={{ background: isPlayed ? 'var(--gradient-block-played)' : 'var(--gradient-block-pending)' }}>
       <div className="font-bold flex items-center gap-1 text-2xl">
         {request.amount}
         <svg
