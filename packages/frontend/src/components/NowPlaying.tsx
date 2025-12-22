@@ -1,4 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
+import YouTube, { YouTubeEvent } from 'react-youtube';
 import { NowPlaying as NowPlayingType } from '@mempool/shared';
 import { useWebSocket } from '@/contexts/websocket-context';
 
@@ -21,144 +22,42 @@ function getYouTubeVideoId(url: string): string | null {
   return null;
 }
 
-// Declare YouTube IFrame API types
-declare global {
-  interface Window {
-    YT: {
-      Player: new (
-        elementId: string,
-        config: {
-          videoId: string;
-          playerVars?: Record<string, number | string>;
-          events?: {
-            onReady?: (event: { target: YTPlayer }) => void;
-            onStateChange?: (event: { data: number; target: YTPlayer }) => void;
-          };
-        }
-      ) => YTPlayer;
-      PlayerState: {
-        ENDED: number;
-        PLAYING: number;
-        PAUSED: number;
-        BUFFERING: number;
-        CUED: number;
-      };
-    };
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
-
-interface YTPlayer {
-  destroy: () => void;
-  loadVideoById: (videoId: string) => void;
-  playVideo: () => void;
-  pauseVideo: () => void;
-}
-
-// Load YouTube IFrame API script once
-let apiLoaded = false;
-let apiReady = false;
-const readyCallbacks: (() => void)[] = [];
-
-function loadYouTubeAPI(callback: () => void) {
-  if (apiReady) {
-    callback();
-    return;
-  }
-
-  readyCallbacks.push(callback);
-
-  if (!apiLoaded) {
-    apiLoaded = true;
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
-    script.async = true;
-    document.body.appendChild(script);
-
-    window.onYouTubeIframeAPIReady = () => {
-      apiReady = true;
-      readyCallbacks.forEach((cb) => cb());
-      readyCallbacks.length = 0;
-    };
-  }
-}
-
 export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPlayingProps) {
   const { playNext, skipCurrent, roomState } = useWebSocket();
-  const playerRef = useRef<YTPlayer | null>(null);
 
-  // Use refs to avoid stale closures in YouTube player callbacks
+  // Use refs to get latest values in callbacks
   const roomStateRef = useRef(roomState);
   const playNextRef = useRef(playNext);
   const skipCurrentRef = useRef(skipCurrent);
 
-  // Keep refs updated
   useEffect(() => {
     roomStateRef.current = roomState;
     playNextRef.current = playNext;
     skipCurrentRef.current = skipCurrent;
   }, [roomState, playNext, skipCurrent]);
 
-  const handlePlayNext = useCallback(() => {
+  const handlePlayNext = () => {
     const nextRequest = roomStateRef.current.requestQueue[0];
+    console.log('handlePlayNext ', nextRequest);
+
     if (nextRequest) {
       const videoId = getYouTubeVideoId(nextRequest.url);
       playNextRef.current(nextRequest.url, videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '');
     }
-  }, []);
+  };
 
   const handleSkip = () => {
     skipCurrentRef.current();
   };
 
-  // Initialize YouTube player for host
-  useEffect(() => {
-    if (!isHost || !currentlyPlaying) return;
-
-    const videoId = getYouTubeVideoId(currentlyPlaying.url);
-    if (!videoId) return;
-
-    loadYouTubeAPI(() => {
-      // Destroy existing player
-      if (playerRef.current) {
-        playerRef.current.destroy();
-        playerRef.current = null;
-      }
-
-      // Create new player
-      playerRef.current = new window.YT.Player('youtube-player', {
-        videoId,
-        playerVars: {
-          autoplay: 1,
-          rel: 0,
-          modestbranding: 1,
-        },
-        events: {
-          onStateChange: (event) => {
-            console.log('onStateChange', event);
-            // YT.PlayerState.ENDED === 0
-            if (event.data === 0) {
-              // Video ended, play next if queue has items
-              if (roomStateRef.current.requestQueue.length > 0) {
-                const nextRequest = roomStateRef.current.requestQueue[0];
-                const nextVideoId = getYouTubeVideoId(nextRequest.url);
-                playNextRef.current(nextRequest.url, nextVideoId ? `https://i.ytimg.com/vi/${nextVideoId}/hqdefault.jpg` : '');
-              } else {
-                skipCurrentRef.current();
-              }
-            }
-          },
-        },
-      });
-    });
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-        playerRef.current = null;
-      }
-    };
-  }, [isHost, currentlyPlaying?.url]); // Only reinit when URL changes
+  const handleVideoEnd = (event: YouTubeEvent) => {
+    console.log('Video ended', event);
+    if (roomStateRef.current.requestQueue.length > 0) {
+      handlePlayNext();
+    } else {
+      skipCurrentRef.current();
+    }
+  };
 
   if (!currentlyPlaying) {
     return (
@@ -207,7 +106,21 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
       {/* Host sees the player, guests see the thumbnail */}
       {isHost && videoId ? (
         <div className="aspect-video w-full mb-4">
-          <div id="youtube-player" className="w-full h-full rounded" />
+          <YouTube
+            videoId={videoId}
+            opts={{
+              width: '100%',
+              height: '100%',
+              playerVars: {
+                autoplay: 1,
+                rel: 0,
+                modestbranding: 1,
+              },
+            }}
+            onEnd={handleVideoEnd}
+            className="w-full h-full"
+            iframeClassName="w-full h-full rounded"
+          />
         </div>
       ) : (
         <div className="flex gap-4 mb-4">

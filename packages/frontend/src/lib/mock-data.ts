@@ -7,7 +7,7 @@ const generateMockRequests = (clientIds: string[], count: number = 10) => {
     requests.push({
       createdAt: Date.now() - i * 1000,
       amount: Math.floor(Math.random() * 10000),
-      url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+      url: `https://www.youtube.com/watch?v=xIthgcx-axs`,
       requesterId: clientIds[i % clientIds.length],
     });
   }
