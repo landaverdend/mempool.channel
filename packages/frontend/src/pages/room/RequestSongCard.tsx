@@ -3,7 +3,8 @@ import { useWebSocket } from '@/contexts/websocket-context';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 import { isValidUrl } from '@/lib/utils';
-import SatsIcon from '@/components/SatsIcon';
+import { SatsIcon } from '@/components/Icons';
+import InvoiceModal from '@/components/InvoiceModal';
 
 const PRESET_AMOUNTS = [100, 500, 1000, 5000];
 
@@ -14,6 +15,8 @@ export default function RequestSongCard() {
   const [url, setUrl] = useState('');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [submittedAmount, setSubmittedAmount] = useState<number | undefined>();
 
   const videoId = getYouTubeVideoId(url);
   const metadata = videoId ? getMetadata(url) : null;
@@ -46,12 +49,23 @@ export default function RequestSongCard() {
       return;
     }
 
+    setSubmittedAmount(amountNum);
+    setShowInvoiceModal(true);
     clearInvoice();
     makeRequest({
       roomCode: roomState.roomCode,
       amount: amountNum,
       url: url.trim(),
     });
+  };
+
+  const handleCloseModal = () => {
+    setShowInvoiceModal(false);
+    clearInvoice();
+    // Clear form on close
+    setUrl('');
+    setAmount('');
+    setSubmittedAmount(undefined);
   };
 
   const handlePresetClick = (preset: number) => {
@@ -64,11 +78,6 @@ export default function RequestSongCard() {
 
       {/* Error Display */}
       {error && <div className="mb-4 p-3 bg-red/10 border border-red rounded text-red text-sm">{error}</div>}
-
-      {/* Invoice Error */}
-      {invoiceState.error && (
-        <div className="mb-4 p-3 bg-red/10 border border-red rounded text-red text-sm">{invoiceState.error}</div>
-      )}
 
       <div className="space-y-4">
         {/* YouTube URL Input */}
@@ -141,31 +150,27 @@ export default function RequestSongCard() {
         {/* Submit Button */}
         <button
           onClick={handleSubmit}
-          disabled={invoiceState.loading || !url.trim() || !amount}
+          disabled={!url.trim() || !amount}
           className="w-full py-3 bg-mainnet text-white rounded font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-          {invoiceState.loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Generating Invoice...
-            </span>
-          ) : (
-            <span className="flex items-center justify-center gap-2">
-              <SatsIcon width={18} height={18} />
-              Request Song
-            </span>
-          )}
+          <span className="flex items-center justify-center gap-2">
+            <SatsIcon width={18} height={18} />
+            Request Song
+          </span>
         </button>
 
         {/* Helper Text */}
         <p className="text-xs text-fg-muted text-center">Higher amounts get priority in the queue</p>
       </div>
+
+      {/* Invoice Modal */}
+      <InvoiceModal
+        isOpen={showInvoiceModal}
+        onClose={handleCloseModal}
+        invoice={invoiceState.invoice}
+        loading={invoiceState.loading}
+        error={invoiceState.error}
+        amount={submittedAmount}
+      />
     </div>
   );
 }

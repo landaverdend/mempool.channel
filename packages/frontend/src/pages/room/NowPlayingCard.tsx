@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import YouTube, { YouTubeEvent } from 'react-youtube';
 import { ClientRequest } from '@mempool/shared';
 import { useWebSocket } from '@/contexts/websocket-context';
-import SatsIcon from '../../components/SatsIcon';
+import { SatsIcon } from '@/components/Icons';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 
 type NowPlayingProps = {

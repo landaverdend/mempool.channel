@@ -1,7 +1,7 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
 import { useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import SatsIcon from './SatsIcon';
+import { SatsIcon } from './Icons';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 
 type RequestQueueProps = {
