@@ -6,6 +6,7 @@ import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/pages/room/RoomHeader';
 import NowPlayingCard from '@/pages/room/NowPlayingCard';
 import HostUploadCard from '@/pages/room/HostUploadCard';
+import RequestSongCard from '@/pages/room/RequestSongCard';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -90,11 +91,7 @@ export default function Room() {
           isHost={roomState.isHost}
           hasQueue={roomState.requestQueue.length > 0}
         />
-        <div className="bg-bg-card rounded-sm p-4">
-          <h2 className="text-lg font-semibold ">Request a Song</h2>
-
-          <div className=""></div>
-        </div>
+        <RequestSongCard />
 
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Song Queue</h2>

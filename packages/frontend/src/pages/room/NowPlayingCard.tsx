@@ -59,7 +59,7 @@ export default function NowPlayingCard({ currentlyPlaying, isHost, hasQueue }: N
   return (
     <div className="bg-bg-card rounded-sm p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-fg">Now Playing</h2>
+        <h2 className="text-lg font-semibold text-primary">Now Playing</h2>
         {isHost && (
           <div className="flex gap-2">
             {hasQueue && (
