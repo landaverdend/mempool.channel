@@ -26,8 +26,8 @@ export default function HostUploadCard() {
           className="bg-bg-input text-white rounded-sm p-2"
         />
         <input
-          type="number"
-          placeholder="Amount"
+          type="text"
+          placeholder="Amount (sats)"
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           className="bg-bg-input text-white rounded-sm p-2"

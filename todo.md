@@ -1,5 +1,6 @@
-- implement room-creation flow
 
-### Flow for creating a Room:
-1. need to get lightning address to send to
-2. need to verify that it can receive funds?
+
+
+TODO:
+
+1. write some tooling on the frontend that can scrape youtube data from just the url (thumbnail, video title, etc..)

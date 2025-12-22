@@ -21,6 +21,7 @@ import {
 } from '@mempool/shared';
 import { createNWCClient } from './nostrClient.js';
 import { Room } from './types.js';
+import { insertSortedDescending } from './utils.js';
 
 const PORT = 8080;
 
@@ -297,8 +298,7 @@ function handleAddRequest(ws: ExtendedWebSocket, payload: MakeRequestPayload): v
     return;
   }
 
-
-  room.requestQueue.push({
+  insertSortedDescending(room.requestQueue, {
     createdAt: Date.now(),
     amount: payload.amount,
     url: payload.url,
@@ -411,6 +411,7 @@ async function handleMakeRequest(ws: ExtendedWebSocket, payload: MakeRequestPayl
   }
 }
 
+// When the video finishes playing on the host side, this function is called to play the next item in the queue
 function handlePlayNext(ws: ExtendedWebSocket, payload: PlayNextPayload): void {
   const roomCode = normalizeRoomCode(payload.roomCode || '');
 
@@ -540,8 +541,12 @@ async function pollInvoices(roomCode: string): Promise<void> {
           requesterId: pending.requesterId,
         });
 
-        // Sort the queue by amount in descending order
-        room.requestQueue.sort((a, b) => b.amount - a.amount);
+        insertSortedDescending(room.requestQueue, {
+          createdAt: Math.floor(Date.now() / 1000),
+          amount: pending.amount,
+          url: pending.requesterUrl,
+          requesterId: pending.requesterId,
+        });
 
         // Broadcast the updated room info to the room
         broadcastToRoom(roomCode, 'item-queued', buildClientRoomInfo(room, pending.requesterId));
