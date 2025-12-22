@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useWebSocket } from './contexts/websocket-context';
-import Home from './pages/Home';
-import Room from './pages/Room';
+import Home from './pages/home/Home';
+import Room from './pages/room/Room';
 
 function AppRoutes() {
   const { connect, connected } = useWebSocket();

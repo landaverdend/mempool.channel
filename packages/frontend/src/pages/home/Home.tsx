@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWebSocket } from '../contexts/websocket-context';
-import Navbar from '../components/Navbar';
+import { useWebSocket } from '../../contexts/websocket-context';
+import Navbar from '../../components/Navbar';
 
 export default function Home() {
   const navigate = useNavigate();

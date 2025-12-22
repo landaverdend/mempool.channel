@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { ClientRoomInfo } from '@mempool/shared';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
+import Navbar from '../../components/Navbar';
 
 type RoomHeaderProps = {
   roomState: ClientRoomInfo;

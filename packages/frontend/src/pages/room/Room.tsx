@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useWebSocket } from '../contexts/websocket-context';
-import InvoiceRequestModal from '../components/InvoiceRequestModal';
+import { useWebSocket } from '../../contexts/websocket-context';
+import InvoiceRequestModal from '../../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
-import RoomHeader from '@/components/RoomHeader';
-import NowPlayingCard from '@/components/NowPlayingCard';
-import HostUploadCard from '@/components/HostUploadCard';
+import RoomHeader from '@/pages/room/RoomHeader';
+import NowPlayingCard from '@/pages/room/NowPlayingCard';
+import HostUploadCard from '@/pages/room/HostUploadCard';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -74,7 +74,7 @@ export default function Room() {
 
       <RequestQueue roomState={roomState} />
 
-      <div className="max-w-3xl mx-auto p-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="max-w-5xl mx-auto p-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200 flex justify-between items-center">
@@ -90,15 +90,14 @@ export default function Room() {
           isHost={roomState.isHost}
           hasQueue={roomState.requestQueue.length > 0}
         />
-
-        <div className="bg-bg-card rounded-sm p-4">
-          <h2 className="text-lg font-semibold ">Song Queue</h2>
-        </div>
-
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Request a Song</h2>
 
           <div className=""></div>
+        </div>
+
+        <div className="bg-bg-card rounded-sm p-4">
+          <h2 className="text-lg font-semibold ">Song Queue</h2>
         </div>
 
         <div className="bg-bg-card rounded-sm p-4">
