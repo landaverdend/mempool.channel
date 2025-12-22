@@ -9,7 +9,7 @@ export interface YoutubeMetadata {
 }
 
 interface YoutubeMetadataContextValue {
-  cache: Map<string, YoutubeMetadata>;
+  cache: Record<string, YoutubeMetadata>;
   getMetadata: (url: string) => YoutubeMetadata | null;
 }
 
@@ -18,8 +18,7 @@ const YoutubeMetadataContext = createContext<YoutubeMetadataContextValue | null>
 export default function YoutubeMetadataProvider({ children }: { children: React.ReactNode }) {
   const { roomState } = useWebSocket();
 
-  //
-  const [cache] = useState<Map<string, YoutubeMetadata>>(new Map());
+  const [cache, setCache] = useState<Record<string, YoutubeMetadata>>({});
 
   // Extract all URLs from room state
   const allUrls = useMemo(() => {
@@ -34,20 +33,20 @@ export default function YoutubeMetadataProvider({ children }: { children: React.
   useEffect(() => {
     allUrls.forEach((url) => {
       const videoId = getYouTubeVideoId(url);
-      if (videoId && !cache.has(videoId)) {
+      if (videoId && !cache[videoId]) {
         getYoutubeMetadata(videoId).then((metadata) => {
           if (metadata) {
-            cache.set(videoId, metadata);
+            setCache((prev) => ({ ...prev, [videoId]: metadata }));
           }
         });
       }
     });
-  }, [allUrls]);
+  }, [allUrls, cache]);
 
   const getMetadata = (url: string) => {
     const videoId = getYouTubeVideoId(url);
     if (!videoId) return null;
-    return cache.get(videoId) ?? null;
+    return cache[videoId] ?? null;
   };
 
   return <YoutubeMetadataContext.Provider value={{ cache, getMetadata }}>{children}</YoutubeMetadataContext.Provider>;

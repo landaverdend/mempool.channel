@@ -57,7 +57,7 @@ function RequestBlock({ request, type }: RequestItemProps) {
   const createdAt = useMemo(() => new Date(request.createdAt).toLocaleTimeString(), [request.createdAt]);
   const metadata = getMetadata(request.url);
 
-  console.log('metadata ', metadata);
+  const title = metadata?.title ?? '';
 
   const [blockClass, blockGradient] = useMemo(() => {
     switch (type) {
@@ -74,6 +74,9 @@ function RequestBlock({ request, type }: RequestItemProps) {
     <div
       className={`relative ${blockClass} w-(--block-size) h-(--block-size) flex flex-col items-center justify-center`}
       style={{ background: blockGradient }}>
+      <span className={`font-semibold text-xs truncate max-w-[100px] ${type === 'current' ? 'text-white' : 'text-yellow'}`}>
+        {title}
+      </span>
       <div className="font-bold flex items-center gap-1 text-2xl">
         {request.amount}
         <SatsIcon />

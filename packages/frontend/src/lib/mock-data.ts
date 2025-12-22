@@ -20,8 +20,7 @@ const members = ['client_abc123', 'client_def456', 'client_ghi789'];
 const currentlyPlaying = {
   url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   title: 'Rick Astley - Never Gonna Give You Up',
-  thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-  startedAt: Date.now() - 60000,
+  createdAt: Date.now() - 60000,
   requesterId: 'client_def456',
   amount: 2100,
 };
@@ -30,9 +29,9 @@ export const MOCK_ROOM_STATE: ClientRoomInfo = {
   roomCode: 'DEMO42',
   isHost: true,
   members: members,
-  currentlyPlaying: null,
-  requestQueue: [],
-  playedRequests: [],
+  currentlyPlaying: currentlyPlaying,
+  requestQueue: [...generateMockRequests(members, 10)],
+  playedRequests: [...generateMockRequests(members, 10)],
 };
 
 export const MOCK_ROOM_MESSAGES: RoomMessage[] = [
