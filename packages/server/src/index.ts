@@ -122,6 +122,9 @@ wss.on('connection', (ws: WebSocket) => {
         handleSkipCurrent(extWs, message.payload as SkipCurrentPayload);
         break;
 
+      case 'add-request':
+        handleAddRequest(extWs, message.payload as MakeRequestPayload);
+        break;
       default:
         console.log(`Unhandled message type: ${message.type}`);
     }
@@ -205,7 +208,7 @@ async function handleCreateRoom(ws: ExtendedWebSocket, payload: CreateRoomPayloa
     members: [ws.clientId],
     createdAt: Date.now(),
     currentlyPlaying: null,
-    requestQueue: generateTestQueue(ws.clientId),
+    requestQueue: [],
     pendingInvoices: [],
     playedRequests: [],
     nwcClient,
@@ -278,6 +281,31 @@ function handleLeaveRoom(ws: ExtendedWebSocket, payload: LeaveRoomPayload): void
   }
 
   removeClientFromRoom(ws.clientId, roomCode);
+}
+
+function handleAddRequest(ws: ExtendedWebSocket, payload: MakeRequestPayload): void {
+  const roomCode = normalizeRoomCode(payload.roomCode || '');
+
+  const room = rooms.get(roomCode);
+  if (!room) {
+    sendError(ws, 'room_not_found', 'Room not found.', roomCode);
+    return;
+  }
+
+  if (room.hostId !== ws.clientId) {
+    sendError(ws, 'not_host', 'Only the host can add requests.', roomCode);
+    return;
+  }
+
+
+  room.requestQueue.push({
+    createdAt: Date.now(),
+    amount: payload.amount,
+    url: payload.url,
+    requesterId: ws.clientId,
+  });
+
+  broadcastToRoom(roomCode, 'item-queued', buildClientRoomInfo(room, ws.clientId));
 }
 
 function handleCloseRoom(ws: ExtendedWebSocket, payload: CloseRoomPayload): void {

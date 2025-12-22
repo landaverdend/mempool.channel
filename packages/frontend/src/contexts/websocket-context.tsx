@@ -73,11 +73,13 @@ interface WebSocketContextValue {
   joinRoom: (roomCode: string) => void;
   leaveRoom: () => void;
   closeRoom: () => void;
+
   sendRoomMessage: (content: string) => void;
 
   // Playback actions (host only)
   playNext: (title: string, thumbnail: string) => void;
   skipCurrent: () => void;
+  addRequest: (url: string, amount: number) => void; // Debug / Host only
 
   // Utility actions
   clearError: () => void;
@@ -354,67 +356,24 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const playNext = useCallback(
     (title: string, thumbnail: string) => {
       if (!roomState.roomCode || !roomState.isHost) return;
-      if (devMode) {
-        // Simulate play next in dev mode
-        setRoomState((prev) => {
-          const nextRequest = prev.requestQueue[0];
-          if (!nextRequest) {
-            return { ...prev, currentlyPlaying: null };
-          }
-          return {
-            ...prev,
-            currentlyPlaying: {
-              url: nextRequest.url,
-              title,
-              thumbnail,
-              startedAt: Date.now(),
-              requesterId: nextRequest.requesterId,
-              amount: nextRequest.amount,
-            },
-            requestQueue: prev.requestQueue.slice(1),
-            playedRequests: prev.currentlyPlaying
-              ? [
-                  ...prev.playedRequests,
-                  {
-                    createdAt: prev.currentlyPlaying.startedAt,
-                    amount: prev.currentlyPlaying.amount,
-                    url: prev.currentlyPlaying.url,
-                    requesterId: prev.currentlyPlaying.requesterId,
-                  },
-                ]
-              : prev.playedRequests,
-          };
-        });
-        return;
-      }
       sendMessage('play-next', { roomCode: roomState.roomCode, title, thumbnail });
     },
-    [sendMessage, roomState.roomCode, roomState.isHost, devMode]
+    [sendMessage, roomState.roomCode, roomState.isHost]
   );
 
   const skipCurrent = useCallback(() => {
     if (!roomState.roomCode || !roomState.isHost) return;
-    if (devMode) {
-      // Simulate skip in dev mode
-      setRoomState((prev) => ({
-        ...prev,
-        currentlyPlaying: null,
-        playedRequests: prev.currentlyPlaying
-          ? [
-              ...prev.playedRequests,
-              {
-                createdAt: prev.currentlyPlaying.startedAt,
-                amount: prev.currentlyPlaying.amount,
-                url: prev.currentlyPlaying.url,
-                requesterId: prev.currentlyPlaying.requesterId,
-              },
-            ]
-          : prev.playedRequests,
-      }));
-      return;
-    }
     sendMessage('skip-current', { roomCode: roomState.roomCode });
-  }, [sendMessage, roomState.roomCode, roomState.isHost, devMode]);
+  }, [sendMessage, roomState.roomCode, roomState.isHost]);
+
+  const addRequest = useCallback(
+    (url: string, amount: number) => {
+      if (!roomState.roomCode || !roomState.isHost) return;
+
+      sendMessage('add-request', { roomCode: roomState.roomCode, url, amount });
+    },
+    [sendMessage, roomState.roomCode, roomState.isHost]
+  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -444,6 +403,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     joinRoom,
     leaveRoom,
     makeRequest,
+    addRequest,
     closeRoom,
     sendRoomMessage,
     playNext,

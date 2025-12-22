@@ -29,6 +29,7 @@ export type MessageType =
   | 'play-next'
   | 'skip-current'
   | 'now-playing'
+  | 'add-request' // Debug / Host only
 
   // Room response types
   | 'room-created'

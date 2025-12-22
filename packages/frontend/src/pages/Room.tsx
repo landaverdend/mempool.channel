@@ -5,12 +5,12 @@ import InvoiceRequestModal from '../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/components/RoomHeader';
 import NowPlaying from '@/components/NowPlaying';
+import HostUploadCard from '@/components/HostUploadCard';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
-  const { connected, roomState, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } =
-    useWebSocket();
+  const { connected, roomState, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } = useWebSocket();
 
   const [messageInput, setMessageInput] = useState('');
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -95,17 +95,17 @@ export default function Room() {
           <h2 className="text-lg font-semibold ">Song Queue</h2>
         </div>
 
-
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Request a Song</h2>
 
           <div className=""></div>
         </div>
 
-
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Chat</h2>
         </div>
+
+        {roomState.isHost && <HostUploadCard />}
 
         {/* Invoice Request */}
         {/* <div className="mb-4 p-4 bg-slate-800 rounded">

@@ -62,7 +62,7 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
 
   if (!currentlyPlaying) {
     return (
-      <div className="bg-bg-box rounded-sm p-4 sm:p-6">
+      <div className="bg-bg-card rounded-sm p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-fg mb-1">Now Playing</h2>
@@ -83,7 +83,7 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
   const videoId = getYouTubeVideoId(currentlyPlaying.url);
 
   return (
-    <div className="bg-bg-box rounded-sm p-4 sm:p-6">
+    <div className="bg-bg-card rounded-sm p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-fg">Now Playing</h2>
         {isHost && (
