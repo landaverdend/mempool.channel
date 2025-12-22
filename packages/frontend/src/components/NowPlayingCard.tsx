@@ -11,7 +11,7 @@ type NowPlayingProps = {
   hasQueue: boolean;
 };
 
-export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPlayingProps) {
+export default function NowPlayingCard({ currentlyPlaying, isHost, hasQueue }: NowPlayingProps) {
   const { playNext, roomState } = useWebSocket();
 
   // Use refs to get latest values in callbacks
@@ -19,7 +19,6 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
   const playNextRef = useRef(playNext);
 
   useEffect(() => {
-    console.log('roomState changed ', roomState);
     roomStateRef.current = roomState;
     playNextRef.current = playNext;
   }, [roomState, playNext]);
@@ -31,7 +30,6 @@ export default function NowPlaying({ currentlyPlaying, isHost, hasQueue }: NowPl
 
   const handleVideoEnd = (event: YouTubeEvent) => {
     console.log('Video ended', event);
-
     // Send message to server to play next item in the queue
     handlePlayNext();
   };

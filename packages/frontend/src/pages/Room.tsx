@@ -4,7 +4,7 @@ import { useWebSocket } from '../contexts/websocket-context';
 import InvoiceRequestModal from '../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/components/RoomHeader';
-import NowPlaying from '@/components/NowPlaying';
+import NowPlayingCard from '@/components/NowPlayingCard';
 import HostUploadCard from '@/components/HostUploadCard';
 
 export default function Room() {
@@ -85,7 +85,7 @@ export default function Room() {
           </div>
         )}
 
-        <NowPlaying
+        <NowPlayingCard
           currentlyPlaying={roomState.currentlyPlaying}
           isHost={roomState.isHost}
           hasQueue={roomState.requestQueue.length > 0}

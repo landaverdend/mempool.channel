@@ -1,5 +1,7 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
 import { useMemo } from 'react';
+import SatsIcon from './SatsIcon';
+import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 
 type RequestQueueProps = {
   roomState: ClientRoomInfo;
@@ -50,7 +52,12 @@ function RequestItem({ request, type, index }: RequestItemProps) {
 }
 
 function RequestBlock({ request, type }: RequestItemProps) {
+  const { getMetadata } = useYoutubeMetadata();
+
   const createdAt = useMemo(() => new Date(request.createdAt).toLocaleTimeString(), [request.createdAt]);
+  const metadata = getMetadata(request.url);
+
+  console.log('metadata ', metadata);
 
   const [blockClass, blockGradient] = useMemo(() => {
     switch (type) {
@@ -69,19 +76,7 @@ function RequestBlock({ request, type }: RequestItemProps) {
       style={{ background: blockGradient }}>
       <div className="font-bold flex items-center gap-1 text-2xl">
         {request.amount}
-        <svg
-          className="-skew-x-10"
-          width="24px"
-          height="24px"
-          viewBox="0 0 24 24"
-          fill="white"
-          xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" clipRule="evenodd" d="M12.75 18.5V21H11.25V18.5H12.75Z" fill="white" />
-          <path fillRule="evenodd" clipRule="evenodd" d="M17 16.75H7V15.25H17V16.75Z" fill="white" />
-          <path fillRule="evenodd" clipRule="evenodd" d="M17 12.7499H7V11.2499H17V12.7499Z" fill="white" />
-          <path fillRule="evenodd" clipRule="evenodd" d="M17 8.75H7V7.25H17V8.75Z" fill="white" />
-          <path fillRule="evenodd" clipRule="evenodd" d="M12.75 3V5.5H11.25V3H12.75Z" fill="white" />
-        </svg>
+        <SatsIcon />
       </div>
       <div className="text-md">{createdAt}</div>
     </div>
