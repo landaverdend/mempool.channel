@@ -7,6 +7,7 @@ import RoomHeader from '@/pages/room/RoomHeader';
 import NowPlayingCard from '@/pages/room/NowPlayingCard';
 import HostUploadCard from '@/pages/room/HostUploadCard';
 import RequestSongCard from '@/pages/room/RequestSongCard';
+import ChatboxCard from './ChatboxCard';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -91,91 +92,16 @@ export default function Room() {
           isHost={roomState.isHost}
           hasQueue={roomState.requestQueue.length > 0}
         />
+
         <RequestSongCard />
 
         <div className="bg-bg-card rounded-sm p-4">
           <h2 className="text-lg font-semibold ">Song Queue</h2>
         </div>
 
-        <div className="bg-bg-card rounded-sm p-4">
-          <h2 className="text-lg font-semibold ">Chat</h2>
-        </div>
+        <ChatboxCard />
 
         {roomState.isHost && <HostUploadCard />}
-
-        {/* Invoice Request */}
-        {/* <div className="mb-4 p-4 bg-slate-800 rounded">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Request Payment</h2>
-            <button
-              onClick={handleOpenModal}
-              className="px-4 py-2 bg-blue-700 text-gray-100 rounded cursor-pointer hover:bg-blue-600 transition-colors">
-              New Request
-            </button>
-          </div>
-
-          {invoiceState.invoice && (
-            <div className="mt-4 p-3 bg-slate-700 rounded">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-400">Invoice:</p>
-                <button onClick={copyInvoice} className="text-xs text-indigo-400 hover:text-indigo-300">
-                  Copy
-                </button>
-              </div>
-              <div className="flex flex-col md:flex-row gap-4 items-start">
-                <div className="shrink-0 bg-white p-3 rounded">
-                  <QRCodeSVG value={invoiceState.invoice} size={200} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-mono text-xs break-all text-green-400">{invoiceState.invoice}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {invoiceState.error && (
-            <div className="mt-4 p-3 bg-red-900/50 border border-red-700 rounded text-red-200">{invoiceState.error}</div>
-          )}
-        </div> */}
-
-        {/* Room Chat */}
-        {/* <div className="p-4 bg-slate-800 rounded">
-          <h2 className="text-lg font-semibold mb-3">Chat</h2>
-          <div className="bg-slate-700 rounded p-3 mb-3">
-            <ul className="max-h-64 overflow-y-auto space-y-2">
-              {roomMessages.length === 0 ? (
-                <li className="text-gray-500 text-sm">No messages yet</li>
-              ) : (
-                roomMessages.map((msg) => (
-                  <li key={msg.id} className="text-sm">
-                    <span className={`font-mono text-xs ${msg.isHost ? 'text-yellow-400' : 'text-indigo-400'}`}>
-                      {msg.senderId}
-                      {msg.isHost && ' (host)'}
-                    </span>
-                    <span className="text-gray-500 text-xs ml-2">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-                    <p className="text-gray-100">{String(msg.content)}</p>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 px-3 py-2 bg-slate-600 text-gray-100 rounded border border-slate-500 focus:border-indigo-500 focus:outline-none"
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!messageInput.trim()}
-              className="px-4 py-2 bg-indigo-700 text-gray-100 rounded cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              Send
-            </button>
-          </div>
-        </div> */}
       </div>
 
       {/* Invoice Request Modal */}
