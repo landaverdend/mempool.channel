@@ -74,7 +74,7 @@ export default function RequestSongCard() {
 
   return (
     <div className="bg-bg-card rounded-sm p-4 sm:p-6">
-      <h2 className="text-lg font-semibold text-primary mb-4">Request a Song</h2>
+      <h2 className="text-lg font-semibold text-fg mb-4">Request a Song</h2>
 
       {/* Error Display */}
       {error && <div className="mb-4 p-3 bg-red/10 border border-red rounded text-red text-sm">{error}</div>}

@@ -19,7 +19,7 @@ export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload
 
   try {
     const invoice = await room.nwcClient.makeInvoice({
-      amount: payload.amount,
+      amount: payload.amount * 1000, // Convert sats to millisats (NIP-47 uses millisats)
       description: payload.comment,
     });
 
@@ -27,10 +27,13 @@ export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload
     const expiresAt = now + 60 * 10; // expires in 10 minutes
 
     // Track pending invoice for payment polling
+    // NWC returns amount in millisats, convert back to sats
+    const amountSats = Math.floor(invoice.amount / 1000);
+
     roomManager.addPendingInvoice(roomCode, {
       paymentHash: invoice.payment_hash,
       invoice: invoice.invoice,
-      amount: invoice.amount,
+      amount: amountSats,
       description: invoice.description || '',
       createdAt: now,
       expiresAt,
@@ -43,7 +46,7 @@ export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload
       invoice: {
         pr: invoice.invoice,
         paymentHash: invoice.payment_hash,
-        amount: invoice.amount,
+        amount: amountSats,
         description: invoice.description,
         expiresAt,
       },
