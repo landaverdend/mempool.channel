@@ -90,6 +90,13 @@ export class RoomManager {
   addToQueue(roomCode: string, request: ClientRequest): boolean {
     const room = this.rooms.get(roomCode);
     if (!room) return false;
+
+    // If there is nothing currently playing, set request as currently playing
+    if (!room.currentlyPlaying) {
+      room.currentlyPlaying = request;
+      return true;
+    }
+    
     insertSortedDescending(room.requestQueue, request);
     return true;
   }
