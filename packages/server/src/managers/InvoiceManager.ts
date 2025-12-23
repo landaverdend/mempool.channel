@@ -7,7 +7,8 @@ export class InvoiceManager {
   constructor(
     private roomManager: RoomManager,
     private clientManager: ClientManager,
-    private broadcastToRoom: (roomCode: string, type: string, payload: unknown) => void
+    private broadcastToRoom: (roomCode: string, type: string, payload: unknown) => void,
+    private broadcastToClient: (roomCode: string, clientId: string, type: string, payload: unknown) => void
   ) {}
 
   startPolling(roomCode: string, intervalMs: number = 3000): void {
@@ -51,7 +52,9 @@ export class InvoiceManager {
           payment_hash: pending.paymentHash,
         });
 
-        if (lookup.settled_at) {
+        console.log('Invoice Lookup: ', lookup);
+
+        if (lookup.settled_at || lookup.state === 'settled' || lookup.state === 'accepted') {
           // Invoice paid - remove from pending
           this.roomManager.removePendingInvoice(roomCode, i);
           console.log(`Invoice paid: ${pending.paymentHash.substring(0, 8)}...`);
@@ -69,6 +72,30 @@ export class InvoiceManager {
           if (clientInfo) {
             this.broadcastToRoom(roomCode, 'item-queued', clientInfo);
           }
+
+          // Broadcast to the requester that their invoice has been paid
+          this.broadcastToClient(room.code, pending.requesterId, 'invoice-paid', {
+            roomCode: room.code,
+            clientId: pending.requesterId,
+            success: true,
+            url: pending.requesterUrl,
+            amount: pending.amount,
+          });
+        }
+
+        if (lookup.state === 'failed') {
+          // Invoice failed - remove from pending
+          this.roomManager.removePendingInvoice(roomCode, i);
+          console.log(`Invoice failed: ${pending.paymentHash.substring(0, 8)}...`);
+
+          // Broadcast to the requester that their invoice has failed
+          this.broadcastToClient(room.code, pending.requesterId, 'invoice-paid', {
+            roomCode: room.code,
+            clientId: pending.requesterId,
+            success: false,
+            url: pending.requesterUrl,
+            amount: pending.amount,
+          });
         }
       } catch (err) {
         console.error(`Error checking invoice ${pending.paymentHash.substring(0, 8)}:`, err);

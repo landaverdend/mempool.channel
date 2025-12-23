@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { createMessage, parseMessage, serializeMessage, generateId } from '@mempool/shared';
+import { createMessage, parseMessage, serializeMessage, generateId, MessageType } from '@mempool/shared';
 import { ClientManager, RoomManager, InvoiceManager, ExtendedWebSocket } from './managers/index.js';
 import { handlers, handleDisconnect, HandlerContext } from './handlers/index.js';
 
@@ -31,7 +31,12 @@ export class MempoolBandServer {
     };
 
     // Create invoice manager with context
-    this.invoiceManager = new InvoiceManager(this.roomManager, this.clientManager, this.broadcastToRoom.bind(this));
+    this.invoiceManager = new InvoiceManager(
+      this.roomManager,
+      this.clientManager,
+      this.broadcastToRoom.bind(this),
+      this.broadcastToClient.bind(this)
+    );
     this.ctx.invoiceManager = this.invoiceManager;
 
     // Create WebSocket server
@@ -129,6 +134,24 @@ export class MempoolBandServer {
       if (excludeClientId && memberId === excludeClientId) return;
       this.clientManager.send(memberId, serializeMessage(message));
     });
+  }
+
+  private broadcastToClient(roomCode: string, clientId: string, type: string, payload: unknown): void {
+    const room = this.roomManager.get(roomCode);
+
+    if (!room) {
+      console.error(`Room ${roomCode} not found`);
+      return;
+    }
+
+    const client = this.clientManager.get(clientId);
+    if (!client) {
+      console.error(`Client ${clientId} not found`);
+      return;
+    }
+
+    const message = createMessage(type as MessageType, payload);
+    client.send(serializeMessage(message));
   }
 
   private sendError(ws: ExtendedWebSocket, error: string, message: string, roomCode?: string): void {

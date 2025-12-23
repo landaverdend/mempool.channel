@@ -15,7 +15,7 @@ interface InvoiceModalProps {
 }
 
 export default function InvoiceModal({ isOpen, onClose, invoice, loading, error, amount }: InvoiceModalProps) {
-  const { roomState, invoiceState, clearInvoice } = useWebSocket();
+  const { invoiceState, clearInvoice } = useWebSocket();
 
   const [copied, setCopied] = useState(false);
 
@@ -26,25 +26,16 @@ export default function InvoiceModal({ isOpen, onClose, invoice, loading, error,
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Detect when payment goes through by checking if our pending URL appears in the queue
+  // Close modal and show toast when invoice is paid
   useEffect(() => {
-    if (!isOpen || !invoiceState.pendingUrl) return;
-
-    const pendingUrl = invoiceState.pendingUrl;
-
-    // Check if the URL is now in the queue or currently playing
-    const isInQueue = roomState.requestQueue.some((req) => req.url === pendingUrl);
-    const isPlaying = roomState.currentlyPlaying?.url === pendingUrl;
-
-    if (isInQueue || isPlaying) {
-      // Payment successful - close modal and show toast
+    if (invoiceState.paid) {
       toast.success('Payment received! Your request has been added to the queue.', {
         duration: 4000,
       });
       clearInvoice();
       onClose();
     }
-  }, [roomState.requestQueue, roomState.currentlyPlaying, invoiceState.pendingUrl, isOpen, clearInvoice, onClose]);
+  }, [invoiceState.paid, clearInvoice, onClose]);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>

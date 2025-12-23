@@ -16,6 +16,7 @@ export type MessageType =
   | 'make-request'
   | 'invoice-generated'
   | 'invoice-error'
+  | 'invoice-paid'
 
   // Room message types
   | 'create-room'
@@ -158,6 +159,15 @@ export interface PlayNextPayload {
 
 export interface SkipCurrentPayload {
   roomCode: string;
+}
+
+export interface InvoicePaidPayload {
+  roomCode: string;
+  clientId: string;
+
+  success: boolean;
+  url: string;
+  amount: number;
 }
 
 export interface NowPlayingPayload {
