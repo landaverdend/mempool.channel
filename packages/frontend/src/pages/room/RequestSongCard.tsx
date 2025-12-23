@@ -164,7 +164,8 @@ export default function RequestSongCard() {
 
       {/* Invoice Modal */}
       <InvoiceModal
-        isOpen={showInvoiceModal}
+      
+isOpen={showInvoiceModal}
         onClose={handleCloseModal}
         invoice={invoiceState.invoice}
         loading={invoiceState.loading}

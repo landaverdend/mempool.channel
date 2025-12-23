@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { useWebSocket } from './contexts/websocket-context';
 import Home from './pages/home/Home';
 import Room from './pages/room/Room';
@@ -25,6 +26,16 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: 'var(--color-bg-card)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-fg)',
+          },
+        }}
+      />
       <AppRoutes />
     </BrowserRouter>
   );

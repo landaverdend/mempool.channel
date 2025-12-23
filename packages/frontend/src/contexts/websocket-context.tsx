@@ -37,6 +37,7 @@ export interface InvoiceState {
   invoice: string | null; // BOLT11 payment request
   loading: boolean;
   error: string | null;
+  pendingUrl: string | null; // URL of the pending request (to detect payment success)
 }
 
 const EMPTY_ROOM_STATE: ClientRoomInfo = {
@@ -102,6 +103,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     invoice: null,
     loading: false,
     error: null,
+    pendingUrl: null,
   });
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -199,11 +201,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
       case 'invoice-generated': {
         const payload = message.payload as InvoiceGeneratedPayload;
-        setInvoiceState({
+        setInvoiceState((prev) => ({
           invoice: payload.invoice.pr,
           loading: false,
           error: null,
-        });
+          pendingUrl: prev.pendingUrl, // Preserve the pending URL
+        }));
         break;
       }
 
@@ -220,6 +223,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           invoice: null,
           loading: false,
           error: payload.error,
+          pendingUrl: null,
         });
         break;
       }
@@ -276,28 +280,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const makeRequest = useCallback(
     (requestPayload: MakeRequestPayload) => {
-      if (devMode) {
-        // Dev mode: skip invoice, add directly to queue
-        setRoomState((prev) => {
-          const newRequest = {
-            createdAt: Date.now(),
-            amount: requestPayload.amount,
-            url: requestPayload.url,
-            requesterId: clientId || 'dev_client',
-          };
-          const newQueue = [...prev.requestQueue, newRequest].sort((a, b) => b.amount - a.amount);
-          return { ...prev, requestQueue: newQueue };
-        });
-        return;
-      }
-      setInvoiceState({ invoice: null, loading: true, error: null });
+      setInvoiceState({ invoice: null, loading: true, error: null, pendingUrl: requestPayload.url });
       sendMessage('make-request', requestPayload);
     },
     [sendMessage, devMode, clientId]
   );
 
   const clearInvoice = useCallback(() => {
-    setInvoiceState({ invoice: null, loading: false, error: null });
+    setInvoiceState({ invoice: null, loading: false, error: null, pendingUrl: null });
   }, []);
 
   const createRoom = useCallback(

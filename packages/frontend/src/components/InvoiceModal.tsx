@@ -1,7 +1,9 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
-import { CopyIcon, LightningIcon, SatsIcon } from '@/components/Icons';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { CopyIcon, SatsIcon } from '@/components/Icons';
+import { useWebSocket } from '@/contexts/websocket-context';
 
 interface InvoiceModalProps {
   isOpen: boolean;
@@ -13,6 +15,8 @@ interface InvoiceModalProps {
 }
 
 export default function InvoiceModal({ isOpen, onClose, invoice, loading, error, amount }: InvoiceModalProps) {
+  const { roomState, invoiceState, clearInvoice } = useWebSocket();
+
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -21,6 +25,26 @@ export default function InvoiceModal({ isOpen, onClose, invoice, loading, error,
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Detect when payment goes through by checking if our pending URL appears in the queue
+  useEffect(() => {
+    if (!isOpen || !invoiceState.pendingUrl) return;
+
+    const pendingUrl = invoiceState.pendingUrl;
+
+    // Check if the URL is now in the queue or currently playing
+    const isInQueue = roomState.requestQueue.some((req) => req.url === pendingUrl);
+    const isPlaying = roomState.currentlyPlaying?.url === pendingUrl;
+
+    if (isInQueue || isPlaying) {
+      // Payment successful - close modal and show toast
+      toast.success('Payment received! Your request has been added to the queue.', {
+        duration: 4000,
+      });
+      clearInvoice();
+      onClose();
+    }
+  }, [roomState.requestQueue, roomState.currentlyPlaying, invoiceState.pendingUrl, isOpen, clearInvoice, onClose]);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
