@@ -61,19 +61,19 @@ export default function ChatboxCard() {
       </div>
 
       {/* Input Area */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 min-w-0">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message..."
-          className="flex-1 px-3 py-2 bg-bg-input text-fg text-sm rounded border border-border focus:border-primary focus:outline-none placeholder:text-fg-muted/50 transition-colors"
+          className="flex-1 min-w-0 px-3 py-2 bg-bg-input text-fg text-sm rounded border border-border focus:border-primary focus:outline-none placeholder:text-fg-muted/50 transition-colors"
         />
         <button
           onClick={handleSend}
           disabled={!message.trim()}
-          className="px-4 py-2 bg-tertiary text-white text-sm font-medium rounde hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md">
+          className="px-3 sm:px-4 py-2 bg-tertiary text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md shrink-0">
           Send
         </button>
       </div>
