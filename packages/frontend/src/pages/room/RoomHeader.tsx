@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 import { ClientRoomInfo } from '@mempool/shared';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';

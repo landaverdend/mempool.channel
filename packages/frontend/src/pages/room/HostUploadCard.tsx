@@ -1,4 +1,4 @@
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 import { useState } from 'react';
 
 export default function HostUploadCard() {

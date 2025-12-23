@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CopyIcon, SatsIcon } from '@/components/Icons';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 
 interface InvoiceModalProps {
   isOpen: boolean;

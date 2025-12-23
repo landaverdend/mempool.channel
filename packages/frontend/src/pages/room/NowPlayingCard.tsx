@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import YouTube, { YouTubeEvent } from 'react-youtube';
 import { ClientRequest } from '@mempool/shared';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 import { SatsIcon } from '@/components/Icons';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';

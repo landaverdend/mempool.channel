@@ -1,5 +1,5 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
-import { RoomMessage } from '@/contexts/websocket-context';
+import { RoomMessage } from '@/contexts/websocketContext';
 
 const generateMockRequests = (clientIds: string[], count: number = 10) => {
   const requests: ClientRequest[] = [];

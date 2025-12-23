@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 import { isValidUrl } from '@/lib/utils';
@@ -10,7 +10,7 @@ const PRESET_AMOUNTS = [100, 500, 1000, 5000];
 
 export default function RequestSongCard() {
   const { roomState, makeRequest, invoiceState, clearInvoice } = useWebSocket();
-  const { getMetadata } = useYoutubeMetadata();
+  const { getMetadata, prefetchMetadata } = useYoutubeMetadata();
 
   const [url, setUrl] = useState('');
   const [amount, setAmount] = useState('');
@@ -20,6 +20,13 @@ export default function RequestSongCard() {
 
   const videoId = getYouTubeVideoId(url);
   const metadata = videoId ? getMetadata(url) : null;
+
+  // Prefetch metadata when URL changes
+  useEffect(() => {
+    if (url) {
+      prefetchMetadata(url);
+    }
+  }, [url, prefetchMetadata]);
 
   // Clear error when inputs change
   useEffect(() => {

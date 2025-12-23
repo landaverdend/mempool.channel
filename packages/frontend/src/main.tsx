@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { WebSocketProvider } from './contexts/websocket-context';
+import { WebSocketProvider } from './contexts/websocketContext';
 import './index.css';
 import YoutubeMetadataProvider from './contexts/youtubeMetadataContext';
 

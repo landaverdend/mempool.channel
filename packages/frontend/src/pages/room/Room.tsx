@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useWebSocket } from '../../contexts/websocket-context';
+import { useWebSocket } from '../../contexts/websocketContext';
 import InvoiceRequestModal from '../../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/pages/room/RoomHeader';

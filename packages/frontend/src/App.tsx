@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useWebSocket } from './contexts/websocket-context';
+import { useWebSocket } from '@/contexts/websocketContext';
 import Home from './pages/home/Home';
 import Room from './pages/room/Room';
 

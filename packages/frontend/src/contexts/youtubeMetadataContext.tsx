@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { useWebSocket } from './websocket-context';
+import { useWebSocket } from './websocketContext';
 import { getYoutubeMetadata, getYouTubeVideoId } from '@/lib/yt-utils';
 
 export interface YoutubeMetadata {
@@ -11,6 +11,7 @@ export interface YoutubeMetadata {
 interface YoutubeMetadataContextValue {
   cache: Record<string, YoutubeMetadata>;
   getMetadata: (url: string) => YoutubeMetadata | null;
+  prefetchMetadata: (url: string) => void;
 }
 
 const YoutubeMetadataContext = createContext<YoutubeMetadataContextValue | null>(null);
@@ -43,13 +44,29 @@ export default function YoutubeMetadataProvider({ children }: { children: React.
     });
   }, [allUrls, cache]);
 
+  const prefetchMetadata = (url: string) => {
+    const videoId = getYouTubeVideoId(url);
+    if (!videoId || cache[videoId]) return;
+
+    getYoutubeMetadata(videoId).then((metadata) => {
+      if (metadata) {
+        setCache((prev) => ({ ...prev, [videoId]: metadata }));
+      }
+    });
+  };
+
   const getMetadata = (url: string) => {
     const videoId = getYouTubeVideoId(url);
     if (!videoId) return null;
-    return cache[videoId] ?? null;
+
+    if (cache[videoId]) return cache[videoId];
+
+    // Trigger fetch if not in cache
+    prefetchMetadata(url);
+    return null;
   };
 
-  return <YoutubeMetadataContext.Provider value={{ cache, getMetadata }}>{children}</YoutubeMetadataContext.Provider>;
+  return <YoutubeMetadataContext.Provider value={{ cache, getMetadata, prefetchMetadata }}>{children}</YoutubeMetadataContext.Provider>;
 }
 
 export function useYoutubeMetadata() {
