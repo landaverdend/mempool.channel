@@ -12,9 +12,8 @@ import ChatboxCard from './ChatboxCard';
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
-  const { connected, roomState, invoiceState, error, makeRequest, sendRoomMessage, clearError, clearInvoice } = useWebSocket();
+  const { connected, roomState, invoiceState, error, makeRequest, clearError, clearInvoice } = useWebSocket();
 
-  const [messageInput, setMessageInput] = useState('');
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   // Redirect to home if not in this room
@@ -32,19 +31,6 @@ export default function Room() {
       setShowInvoiceModal(false);
     }
   }, [invoiceState.invoice, invoiceState.loading]);
-
-  const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      sendRoomMessage(messageInput);
-      setMessageInput('');
-    }
-  };
-
-  const copyInvoice = () => {
-    if (invoiceState.invoice) {
-      navigator.clipboard.writeText(invoiceState.invoice);
-    }
-  };
 
   const handleRequestPayment = (amount: number, url: string, comment?: string) => {
     if (!roomState.roomCode) return;
