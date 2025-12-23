@@ -98,7 +98,7 @@ export default function Home() {
           {mode === 'select' && (
             <div className="bg-bg-card rounded-lg p-6 sm:p-8">
               <h1 className="text-xl sm:text-2xl font-semibold text-fg mb-2">
-                Welcome to mempool<span className="text-title-purple">.band</span>
+                Welcome to mempool<span className="text-title-purple">.music</span>
               </h1>
               <p className="text-fg-muted text-sm sm:text-base mb-8">
                 Host a listening party or join an existing room to queue songs with Lightning payments.

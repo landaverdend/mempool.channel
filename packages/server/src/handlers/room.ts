@@ -127,21 +127,11 @@ export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx)
   }
 
   // Broadcast to all room members (including sender)
-  const members = roomManager.getMembers(roomCode);
-  members.forEach((memberId) => {
-    clientManager.send(
-      memberId,
-      JSON.stringify({
-        type: 'room-message',
-        timestamp: Date.now(),
-        payload: {
-          roomCode,
-          senderId: ws.clientId,
-          content: payload.content,
-          isHost: roomManager.isHost(roomCode, ws.clientId),
-        },
-      })
-    );
+  ctx.broadcastToRoom(roomCode, 'room-message', {
+    roomCode,
+    senderId: ws.clientId,
+    content: payload.content,
+    isHost: roomManager.isHost(roomCode, ws.clientId),
   });
 };
 
