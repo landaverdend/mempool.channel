@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { toast } from 'sonner';
 import {
   createMessage,
   parseMessage,
@@ -12,9 +13,7 @@ import {
   CreateRoomPayload,
   MakeRequestPayload,
   InvoiceGeneratedPayload,
-  InvoiceErrorPayload,
   ClientRoomInfo,
-  InvoicePaidPayload,
 } from '@mempool/shared';
 import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES } from '@/lib/mock-data';
 
@@ -37,7 +36,6 @@ export interface RoomMessage {
 export interface InvoiceState {
   invoice: string | null; // BOLT11 payment request
   loading: boolean;
-  error: string | null;
   paid: boolean;
 }
 
@@ -103,7 +101,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [invoiceState, setInvoiceState] = useState<InvoiceState>({
     invoice: null,
     loading: false,
-    error: null,
     paid: false,
   });
 
@@ -205,7 +202,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         setInvoiceState({
           invoice: payload.invoice.pr,
           loading: false,
-          error: null,
           paid: false,
         });
         break;
@@ -222,18 +218,16 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         setInvoiceState({
           invoice: null,
           loading: false,
-          error: null,
           paid: true,
         });
         break;
       }
 
       case 'invoice-error': {
-        const payload = message.payload as InvoiceErrorPayload;
+        toast.error('Failed to generate invoice. Please try again.');
         setInvoiceState({
           invoice: null,
           loading: false,
-          error: payload.error,
           paid: false,
         });
         break;
@@ -291,14 +285,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const makeRequest = useCallback(
     (requestPayload: MakeRequestPayload) => {
-      setInvoiceState({ invoice: null, loading: true, error: null, paid: false });
+      setInvoiceState({ invoice: null, loading: true, paid: false });
       sendMessage('make-request', requestPayload);
     },
     [sendMessage]
   );
 
   const clearInvoice = useCallback(() => {
-    setInvoiceState({ invoice: null, loading: false, error: null, paid: false });
+    setInvoiceState({ invoice: null, loading: false, paid: false });
   }, []);
 
   const createRoom = useCallback(

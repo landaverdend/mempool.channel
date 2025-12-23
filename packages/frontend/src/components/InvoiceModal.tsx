@@ -10,11 +10,10 @@ interface InvoiceModalProps {
   onClose: () => void;
   invoice: string | null;
   loading: boolean;
-  error: string | null;
   amount?: number;
 }
 
-export default function InvoiceModal({ isOpen, onClose, invoice, loading, error, amount }: InvoiceModalProps) {
+export default function InvoiceModal({ isOpen, onClose, invoice, loading, amount }: InvoiceModalProps) {
   const { invoiceState, clearInvoice } = useWebSocket();
 
   const [copied, setCopied] = useState(false);
@@ -36,6 +35,13 @@ export default function InvoiceModal({ isOpen, onClose, invoice, loading, error,
       onClose();
     }
   }, [invoiceState.paid, clearInvoice, onClose]);
+
+  // Close modal if invoice generation failed (invoice becomes null while not loading)
+  useEffect(() => {
+    if (isOpen && !loading && !invoice && !invoiceState.paid) {
+      onClose();
+    }
+  }, [isOpen, loading, invoice, invoiceState.paid, onClose]);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -59,20 +65,8 @@ export default function InvoiceModal({ isOpen, onClose, invoice, loading, error,
             </div>
           )}
 
-          {/* Error State */}
-          {error && !loading && (
-            <div className="py-8">
-              <div className="p-4 bg-red/10 border border-red rounded text-red text-sm mb-4">{error}</div>
-              <button
-                onClick={onClose}
-                className="w-full py-3 bg-secondary text-fg rounded font-medium hover:opacity-90 transition-opacity cursor-pointer">
-                Close
-              </button>
-            </div>
-          )}
-
           {/* Invoice Display */}
-          {invoice && !loading && !error && (
+          {invoice && !loading && (
             <div className="space-y-4">
               {/* Amount Display */}
               {amount && (

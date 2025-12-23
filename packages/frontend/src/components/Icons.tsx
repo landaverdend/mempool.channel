@@ -9,7 +9,7 @@ type IconProps = {
 export function SatsIcon({ className, width = 24, height = 24 }: IconProps) {
   return (
     <svg
-      className={cn('-skew-x-10', className)}
+      className={cn('-skew-x-7 skew-y-5', className)}
       width={width}
       height={height}
       viewBox="0 0 24 24"
