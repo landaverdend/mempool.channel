@@ -98,7 +98,10 @@ function ChatMessage({ message, isOwn, formatTime, truncateId }: ChatMessageProp
       </div>
 
       {/* Message Content */}
-      <div className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${isOwn ? 'bg-primary/80 text-fg' : 'bg-secondary text-fg'}`}>
+      <div
+        className={`max-w-[60%] px-3 py-2 rounded-lg text-sm wrap-break-word ${
+          isOwn ? 'bg-primary/80 text-fg' : 'bg-secondary text-fg'
+        }`}>
         {String(message.content)}
       </div>
     </div>
