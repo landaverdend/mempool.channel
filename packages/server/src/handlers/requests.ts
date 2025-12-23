@@ -1,4 +1,4 @@
-import { MakeRequestPayload, normalizeRoomCode } from '@mempool/shared';
+import { createMessage, MakeRequestPayload, normalizeRoomCode } from '@mempool/shared';
 import { Handler } from './types.js';
 
 export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload, ctx) => {
@@ -88,5 +88,5 @@ export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx)
   }
 
   const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId);
-  ctx.broadcastToRoom(roomCode, 'item-queued', clientInfo);
+  ctx.broadcastToRoom(roomCode, createMessage('item-queued', clientInfo));
 };

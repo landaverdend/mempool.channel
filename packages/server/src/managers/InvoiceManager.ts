@@ -1,5 +1,6 @@
 import { RoomManager } from './RoomManager.js';
 import { ClientManager } from './ClientManager.js';
+import { createMessage, Message } from '@mempool/shared';
 
 export class InvoiceManager {
   private pollIntervals = new Map<string, ReturnType<typeof setInterval>>();
@@ -7,7 +8,7 @@ export class InvoiceManager {
   constructor(
     private roomManager: RoomManager,
     private clientManager: ClientManager,
-    private broadcastToRoom: (roomCode: string, type: string, payload: unknown) => void,
+    private broadcastToRoom: (roomCode: string, message: Message) => void,
     private broadcastToClient: (roomCode: string, clientId: string, type: string, payload: unknown) => void
   ) {}
 
@@ -70,7 +71,7 @@ export class InvoiceManager {
           // Broadcast the updated room info
           const clientInfo = this.roomManager.buildClientInfo(roomCode, pending.requesterId);
           if (clientInfo) {
-            this.broadcastToRoom(roomCode, 'item-queued', clientInfo);
+            this.broadcastToRoom(roomCode, createMessage('item-queued', clientInfo));
           }
 
           // Broadcast to the requester that their invoice has been paid

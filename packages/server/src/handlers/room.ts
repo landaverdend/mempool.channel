@@ -6,6 +6,7 @@ import {
   RoomMessagePayload,
   normalizeRoomCode,
   isValidRoomCode,
+  createMessage,
 } from '@mempool/shared';
 import { createNWCClient } from '../nostrClient.js';
 import { Handler, HandlerContext } from './types.js';
@@ -76,8 +77,10 @@ export const handleJoinRoom: Handler<JoinRoomPayload> = (ws, payload, ctx) => {
   const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId);
   ctx.sendMessage(ws, 'room-joined', clientInfo);
 
+  const message = createMessage('user-joined', { roomCode, clientId: ws.clientId });
+
   // Notify other room members
-  ctx.broadcastToRoom(roomCode, 'user-joined', { roomCode, clientId: ws.clientId }, ws.clientId);
+  ctx.broadcastToRoom(roomCode, message, ws.clientId);
 };
 
 export const handleLeaveRoom: Handler<LeaveRoomPayload> = (ws, payload, ctx) => {
@@ -126,13 +129,15 @@ export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx)
     return;
   }
 
-  // Broadcast to all room members (including sender)
-  ctx.broadcastToRoom(roomCode, 'room-message', {
+  const message = createMessage('room-message', {
     roomCode,
     senderId: ws.clientId,
     content: payload.content,
     isHost: roomManager.isHost(roomCode, ws.clientId),
   });
+
+  // Broadcast to all room members (including sender)
+  ctx.broadcastToRoom(roomCode, message);
 };
 
 // Helper functions for room management
@@ -167,7 +172,7 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
   }
 
   // Notify remaining members
-  ctx.broadcastToRoom(roomCode, 'user-left', { roomCode, clientId });
+  ctx.broadcastToRoom(roomCode, createMessage('user-left', { roomCode, clientId }));
 }
 
 export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected' | 'all_left', ctx: HandlerContext): void {

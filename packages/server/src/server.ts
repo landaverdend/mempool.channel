@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { createMessage, parseMessage, serializeMessage, generateId, MessageType } from '@mempool/shared';
+import { createMessage, parseMessage, serializeMessage, generateId, MessageType, Message } from '@mempool/shared';
 import { ClientManager, RoomManager, InvoiceManager, ExtendedWebSocket } from './managers/index.js';
 import { handlers, handleDisconnect, HandlerContext } from './handlers/index.js';
 
@@ -126,9 +126,8 @@ export class MempoolBandServer {
   }
 
   // Helper methods (used by handlers via context)
-  private broadcastToRoom(roomCode: string, type: string, payload: unknown, excludeClientId?: string): void {
+  private broadcastToRoom(roomCode: string, message: Message, excludeClientId?: string): void {
     const members = this.roomManager.getMembers(roomCode);
-    const message = createMessage(type as Parameters<typeof createMessage>[0], payload);
 
     members.forEach((memberId) => {
       if (excludeClientId && memberId === excludeClientId) return;
