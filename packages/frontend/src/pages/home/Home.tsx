@@ -10,6 +10,7 @@ export default function Home() {
   const [mode, setMode] = useState<'select' | 'create' | 'join'>('select');
   const [joinCode, setJoinCode] = useState('');
   const [nwcUrl, setNwcUrl] = useState('');
+  const [name, setName] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -161,7 +162,7 @@ export default function Home() {
 
           {/* Mode: Create */}
           {mode === 'create' && (
-            <div className="bg-bg-box border border-border rounded-lg p-6 sm:p-8">
+            <div className="bg-bg-card rounded-lg p-6 sm:p-8">
               <BackButton onClick={resetToSelect} disabled={isLoading} />
 
               <h2 className="text-xl font-semibold text-fg mb-2">Host a Room</h2>
@@ -170,6 +171,20 @@ export default function Home() {
               </p>
 
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Room Name (optional)</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Chuck McDuck"
+                    className="w-full px-4 py-3 bg-bg-input border border-border rounded-lg text-fg placeholder-fg-muted/50 focus:outline-none focus:border-primary transition-colors text-sm"
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateRoom()}
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-fg-muted mb-2">NWC Connection String</label>
                   <input
@@ -204,13 +219,28 @@ export default function Home() {
 
           {/* Mode: Join */}
           {mode === 'join' && (
-            <div className="bg-bg-box border border-border rounded-lg p-6 sm:p-8">
+            <div className="bg-bg-card rounded-lg p-6 sm:p-8">
               <BackButton onClick={resetToSelect} disabled={isLoading} />
 
               <h2 className="text-xl font-semibold text-fg mb-2">Join a Room</h2>
               <p className="text-fg-muted text-sm mb-6">Enter the 6-character code shared by the host.</p>
 
               <div className="space-y-4">
+
+                <div>
+                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Room Name (optional)</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Chuck McDuck"
+                    className="w-full px-4 py-3 bg-bg-input border border-border rounded-lg text-fg placeholder-fg-muted/50 focus:outline-none focus:border-primary transition-colors text-sm"
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateRoom()}
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-fg-muted mb-2">Room Code</label>
                   <input
