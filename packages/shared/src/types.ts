@@ -135,6 +135,7 @@ export interface UserLeftPayload {
 export interface RoomMessageReceivedPayload {
   roomCode: string;
   senderId: string;
+  senderName: string;
   content: unknown;
   isHost: boolean;
 }

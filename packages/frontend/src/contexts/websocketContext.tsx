@@ -28,6 +28,7 @@ const isDevMode = () => {
 
 export interface RoomMessage {
   id: string;
+  senderName: string;
   senderId: string;
   content: unknown;
   isHost: boolean;
@@ -138,6 +139,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       case 'room-created':
       case 'room-joined': {
         const payload = message.payload as ClientRoomInfo;
+        console.log('room-created or room-joined payload: ', payload);
         setRoomState({ ...payload });
         setRoomMessages([]);
         setError(null);
@@ -184,6 +186,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           {
             id: message.id,
             senderId: payload.senderId,
+            senderName: payload.senderName,
             content: payload.content,
             isHost: payload.isHost,
             timestamp: message.timestamp,
@@ -325,6 +328,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const sendRoomMessage = useCallback(
     (content: string) => {
       if (roomState.roomCode && content.trim()) {
+
+
         if (devMode) {
           // Add message locally in dev mode
           setRoomMessages((prev) => [
@@ -332,6 +337,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             {
               id: `msg_${Date.now()}`,
               senderId: clientId || 'dev_client',
+              senderName: 'dev_client',
               content: content.trim(),
               isHost: roomState.isHost,
               timestamp: Date.now(),

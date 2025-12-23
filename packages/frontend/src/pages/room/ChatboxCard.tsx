@@ -32,7 +32,7 @@ export default function ChatboxCard() {
   };
 
   const truncateId = (id: string) => {
-    if (id.length <= 8) return id;
+    if (id.length <= 15) return id;
     return `${id.slice(0, 4)}...${id.slice(-4)}`;
   };
 
@@ -92,13 +92,13 @@ function ChatMessage({ message, isOwn, formatTime, truncateId }: ChatMessageProp
     <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
       {/* Header: Sender ID, Host Badge, Timestamp */}
       <div className="flex items-center gap-2 mb-0.5">
-        <span className={`text-xs font-mono ${isOwn ? 'text-primary' : 'text-fg-muted'}`}>{truncateId(message.senderId)}</span>
+        <span className={`text-xs font-mono ${isOwn ? 'text-primary' : 'text-fg-muted'}`}>{truncateId(message.senderName)}</span>
         {message.isHost && <span className="text-[10px] px-1.5 py-0.5 bg-mainnet/20 text-mainnet rounded font-medium">HOST</span>}
         <span className="text-[10px] text-fg-muted/60">{formatTime(message.timestamp)}</span>
       </div>
 
       {/* Message Content */}
-      <div className={`max-w-[85%] px-3 py-2 rounded-lg text-sm ${isOwn ? 'bg-primary/80 text-fg' : 'bg-secondary text-fg'}`}>
+      <div className={`max-w-[60%] px-3 py-2 rounded-lg text-sm ${isOwn ? 'bg-primary/80 text-fg' : 'bg-secondary text-fg'}`}>
         {String(message.content)}
       </div>
     </div>

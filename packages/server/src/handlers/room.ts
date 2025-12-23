@@ -135,6 +135,7 @@ export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx)
   const message = createMessage('room-message', {
     roomCode,
     senderId: ws.clientId,
+    senderName: clientManager.getName(ws.clientId) || '',
     content: payload.content,
     isHost: roomManager.isHost(roomCode, ws.clientId),
   });

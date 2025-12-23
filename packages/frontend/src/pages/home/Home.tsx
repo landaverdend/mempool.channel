@@ -55,7 +55,7 @@ export default function Home() {
     }
 
     if (!name.trim()) {
-      setLocalError('Please enter a room name');
+      setLocalError('Please enter a name');
       return;
     }
 
@@ -237,7 +237,7 @@ export default function Home() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Room Name (optional)</label>
+                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Name </label>
                   <input
                     type="text"
                     value={name}
