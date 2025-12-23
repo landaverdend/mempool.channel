@@ -39,44 +39,9 @@ export const handlePlayNext: Handler<PlayNextPayload> = (ws, payload, ctx) => {
   // Broadcast updated state to all room members
   const members = roomManager.getMembers(roomCode);
   members.forEach((memberId) => {
-    const clientInfo = roomManager.buildClientInfo(roomCode, memberId);
+    const clientInfo = roomManager.buildClientInfo(roomCode, memberId, clientManager);
     if (clientInfo) {
       const message = createMessage('now-playing', clientInfo);
-      clientManager.send(memberId, serializeMessage(message));
-    }
-  });
-};
-
-export const handleSkipCurrent: Handler<SkipCurrentPayload> = (ws, payload, ctx) => {
-  const { roomManager, clientManager } = ctx;
-  const roomCode = normalizeRoomCode(payload.roomCode || '');
-
-  const room = roomManager.get(roomCode);
-  if (!room) {
-    ctx.sendError(ws, 'room_not_found', 'Room not found.', roomCode);
-    return;
-  }
-
-  // Only host can control playback
-  if (!roomManager.isHost(roomCode, ws.clientId)) {
-    ctx.sendError(ws, 'not_host', 'Only the host can control playback.', roomCode);
-    return;
-  }
-
-  // Move current song to played if exists
-  if (room.currentlyPlaying) {
-    roomManager.addToPlayedRequests(roomCode, room.currentlyPlaying);
-    roomManager.setCurrentlyPlaying(roomCode, null);
-  }
-
-  console.log(`Skipped current song in ${roomCode}`);
-
-  // Broadcast updated state to all room members
-  const members = roomManager.getMembers(roomCode);
-  members.forEach((memberId) => {
-    const clientInfo = roomManager.buildClientInfo(roomCode, memberId);
-    const message = createMessage('now-playing', clientInfo);
-    if (clientInfo) {
       clientManager.send(memberId, serializeMessage(message));
     }
   });

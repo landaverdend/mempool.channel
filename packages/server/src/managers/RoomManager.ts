@@ -1,8 +1,9 @@
 import { NWCClient } from '@getalby/sdk';
-import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
+import { ClientRequest, ClientRoomInfo, Client } from '@mempool/shared';
 import { Room, PendingInvoice } from '../types.js';
 import { generateRoomCode } from '@mempool/shared';
 import { insertSortedDescending } from '../utils.js';
+import { ClientManager } from './ClientManager.js';
 
 export type RoomCloseReason = 'host_closed' | 'host_disconnected' | 'all_left';
 
@@ -144,14 +145,19 @@ export class RoomManager {
   }
 
   // Build client-facing room info
-  buildClientInfo(roomCode: string, clientId: string): ClientRoomInfo | null {
+  buildClientInfo(roomCode: string, clientId: string, clientManager: ClientManager): ClientRoomInfo | null {
     const room = this.rooms.get(roomCode);
     if (!room) return null;
+
+    // Build Client objects with names for each member
+    const members: Client[] = room.members
+      .map((memberId) => clientManager.getClient(memberId))
+      .filter((client): client is Client => client !== undefined);
 
     return {
       roomCode: room.code,
       isHost: room.hostId === clientId,
-      members: room.members,
+      members,
       currentlyPlaying: room.currentlyPlaying,
       playedRequests: room.playedRequests,
       requestQueue: room.requestQueue,

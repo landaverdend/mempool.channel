@@ -150,7 +150,7 @@ export class MempoolBandServer {
     }
 
     const message = createMessage(type as MessageType, payload);
-    client.send(serializeMessage(message));
+    client.ws.send(serializeMessage(message));
   }
 
   private sendError(ws: ExtendedWebSocket, error: string, message: string, roomCode?: string): void {

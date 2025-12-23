@@ -37,10 +37,15 @@ export default function Home() {
       return;
     }
 
+    if (!name.trim()) {
+      setLocalError('Please enter a room name');
+      return;
+    }
+
     setLocalError(null);
     clearError();
     setIsLoading(true);
-    createRoom({ nwcUrl });
+    createRoom({ nwcUrl, name });
   };
 
   const handleJoinRoom = () => {
@@ -49,10 +54,15 @@ export default function Home() {
       return;
     }
 
+    if (!name.trim()) {
+      setLocalError('Please enter a room name');
+      return;
+    }
+
     setLocalError(null);
     clearError();
     setIsLoading(true);
-    joinRoom(joinCode);
+    joinRoom({ roomCode: joinCode, name });
   };
 
   const resetToSelect = () => {
@@ -172,7 +182,7 @@ export default function Home() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Room Name (optional)</label>
+                  <label className="block text-sm font-medium text-fg-muted mb-2">Your Name</label>
                   <input
                     type="text"
                     value={name}
@@ -226,7 +236,6 @@ export default function Home() {
               <p className="text-fg-muted text-sm mb-6">Enter the 6-character code shared by the host.</p>
 
               <div className="space-y-4">
-
                 <div>
                   <label className="block text-sm font-medium text-fg-muted mb-2">Your Room Name (optional)</label>
                   <input

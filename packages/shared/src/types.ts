@@ -52,6 +52,7 @@ export interface DataPayload {
 // Room request payloads
 export interface JoinRoomPayload {
   roomCode: string;
+  name: string;
 }
 
 export interface LeaveRoomPayload {
@@ -69,6 +70,13 @@ export interface RoomMessagePayload {
 
 export interface CreateRoomPayload {
   nwcUrl: string;
+  name: string;
+}
+
+// Client info
+export interface Client {
+  clientId: string;
+  name: string;
 }
 
 // Client request info sent to clients (subset of server Request)
@@ -83,7 +91,7 @@ export interface ClientRequest {
 export interface ClientRoomInfo {
   roomCode: string;
   isHost: boolean;
-  members: string[];
+  members: Client[];
 
   currentlyPlaying: ClientRequest | null;
   playedRequests: ClientRequest[];
@@ -116,12 +124,12 @@ export type RoomErrorType =
 
 export interface UserJoinedPayload {
   roomCode: string;
-  clientId: string;
+  client: Client;
 }
 
 export interface UserLeftPayload {
   roomCode: string;
-  clientId: string;
+  client: Client;
 }
 
 export interface RoomMessageReceivedPayload {

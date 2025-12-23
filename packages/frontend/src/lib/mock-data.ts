@@ -1,21 +1,25 @@
-import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
+import { ClientRequest, ClientRoomInfo, Client } from '@mempool/shared';
 import { RoomMessage } from '@/contexts/websocketContext';
 
-const generateMockRequests = (clientIds: string[], count: number = 10) => {
+const members: Client[] = [
+  { clientId: 'client_abc123', name: 'Alice' },
+  { clientId: 'client_def456', name: 'Bob' },
+  { clientId: 'client_ghi789', name: 'Charlie' },
+];
+
+const generateMockRequests = (clients: Client[], count: number = 10) => {
   const requests: ClientRequest[] = [];
   for (let i = 0; i < count; i++) {
     requests.push({
       createdAt: Date.now() - i * 1000,
       amount: Math.floor(Math.random() * 10000),
       url: `https://www.youtube.com/watch?v=xIthgcx-axs`,
-      requesterId: clientIds[i % clientIds.length],
+      requesterId: clients[i % clients.length].clientId,
     });
   }
   // Sort by amount descending - highest paying requests first
   return requests.sort((a, b) => b.amount - a.amount);
 };
-
-const members = ['client_abc123', 'client_def456', 'client_ghi789'];
 
 const currentlyPlaying = {
   url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',

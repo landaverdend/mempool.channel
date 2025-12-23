@@ -34,6 +34,7 @@ export const handleCreateRoom: Handler<CreateRoomPayload> = async (ws, payload, 
   // Create room
   const room = roomManager.create(ws.clientId, nwcClient);
   clientManager.setRoom(ws.clientId, room.code);
+  clientManager.setName(ws.clientId, payload.name);
 
   // Start polling for invoice payments
   invoiceManager.startPolling(room.code);
@@ -41,7 +42,7 @@ export const handleCreateRoom: Handler<CreateRoomPayload> = async (ws, payload, 
   console.log(`Room created: ${room.code} by ${ws.clientId}`);
 
   // Send confirmation to host
-  const clientInfo = roomManager.buildClientInfo(room.code, ws.clientId);
+  const clientInfo = roomManager.buildClientInfo(room.code, ws.clientId, clientManager);
   ctx.sendMessage(ws, 'room-created', clientInfo);
 };
 
@@ -70,14 +71,16 @@ export const handleJoinRoom: Handler<JoinRoomPayload> = (ws, payload, ctx) => {
   // Add to room
   roomManager.addMember(roomCode, ws.clientId);
   clientManager.setRoom(ws.clientId, roomCode);
+  clientManager.setName(ws.clientId, payload.name);
 
-  console.log(`Client ${ws.clientId} joined room ${roomCode}`);
+  console.log(`Client ${ws.clientId} (${payload.name}) joined room ${roomCode}`);
 
   // Send join confirmation to new member
-  const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId);
+  const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId, clientManager);
   ctx.sendMessage(ws, 'room-joined', clientInfo);
 
-  const message = createMessage('user-joined', { roomCode, clientId: ws.clientId });
+  const client = clientManager.getClient(ws.clientId);
+  const message = createMessage('user-joined', { roomCode, client });
 
   // Notify other room members
   ctx.broadcastToRoom(roomCode, message, ws.clientId);
@@ -147,14 +150,17 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
   const room = roomManager.get(roomCode);
   if (!room) return;
 
+  // Get client info BEFORE removing (for the user-left notification)
+  const client = clientManager.getClient(clientId);
+  const connectedClient = clientManager.get(clientId);
+
   // Remove from room
   roomManager.removeMember(roomCode, clientId);
   clientManager.clearRoom(clientId);
 
   // Send leave confirmation
-  const ws = clientManager.get(clientId);
-  if (ws) {
-    ctx.sendMessage(ws, 'room-left', { roomCode });
+  if (connectedClient) {
+    ctx.sendMessage(connectedClient.ws, 'room-left', { roomCode });
   }
 
   console.log(`Client ${clientId} left room ${roomCode}`);
@@ -172,7 +178,9 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
   }
 
   // Notify remaining members
-  ctx.broadcastToRoom(roomCode, createMessage('user-left', { roomCode, clientId }));
+  if (client) {
+    ctx.broadcastToRoom(roomCode, createMessage('user-left', { roomCode, client }));
+  }
 }
 
 export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected' | 'all_left', ctx: HandlerContext): void {

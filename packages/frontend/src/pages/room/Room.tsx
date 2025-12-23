@@ -12,7 +12,7 @@ import ChatboxCard from './ChatboxCard';
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
-  const { connected, roomState, invoiceState, error, makeRequest, clearError, clearInvoice } = useWebSocket();
+  const { connected, roomState, invoiceState, error, makeRequest, clearError } = useWebSocket();
 
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
@@ -35,11 +35,6 @@ export default function Room() {
   const handleRequestPayment = (amount: number, url: string, comment?: string) => {
     if (!roomState.roomCode) return;
     makeRequest({ roomCode: roomState.roomCode, amount, comment, url });
-  };
-
-  const handleOpenModal = () => {
-    clearInvoice();
-    setShowInvoiceModal(true);
   };
 
   if (!connected) {

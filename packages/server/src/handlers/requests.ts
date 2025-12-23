@@ -59,7 +59,7 @@ export const handleMakeRequest: Handler<MakeRequestPayload> = async (ws, payload
 
 // Host Only Upload - Maybe dont
 export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx) => {
-  const { roomManager } = ctx;
+  const { roomManager, clientManager } = ctx;
   const roomCode = normalizeRoomCode(payload.roomCode || '');
 
   const room = roomManager.get(roomCode);
@@ -87,6 +87,6 @@ export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx)
     roomManager.addToQueue(roomCode, request);
   }
 
-  const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId);
+  const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId, clientManager);
   ctx.broadcastToRoom(roomCode, createMessage('item-queued', clientInfo));
 };

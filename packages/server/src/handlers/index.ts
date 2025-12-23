@@ -1,6 +1,6 @@
 import type { Handler } from './types.js';
 import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleRoomMessage } from './room.js';
-import { handlePlayNext, handleSkipCurrent } from './playback.js';
+import { handlePlayNext } from './playback.js';
 import { handleMakeRequest, handleHostRequest } from './requests.js';
 
 // Handler map - maps message types to their handlers

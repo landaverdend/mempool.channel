@@ -69,7 +69,7 @@ export class InvoiceManager {
           });
 
           // Broadcast the updated room info
-          const clientInfo = this.roomManager.buildClientInfo(roomCode, pending.requesterId);
+          const clientInfo = this.roomManager.buildClientInfo(roomCode, pending.requesterId, this.clientManager);
           if (clientInfo) {
             this.broadcastToRoom(roomCode, createMessage('item-queued', clientInfo));
           }

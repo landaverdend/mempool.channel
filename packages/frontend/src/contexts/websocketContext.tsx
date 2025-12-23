@@ -14,6 +14,7 @@ import {
   MakeRequestPayload,
   InvoiceGeneratedPayload,
   ClientRoomInfo,
+  JoinRoomPayload,
 } from '@mempool/shared';
 import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES } from '@/lib/mock-data';
 
@@ -70,7 +71,7 @@ interface WebSocketContextValue {
   // Room actions
   createRoom: (payload: CreateRoomPayload) => void;
   makeRequest: (payload: MakeRequestPayload) => void;
-  joinRoom: (roomCode: string) => void;
+  joinRoom: (payload: JoinRoomPayload) => void;
   leaveRoom: () => void;
   closeRoom: () => void;
 
@@ -162,7 +163,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         const payload = message.payload as UserJoinedPayload;
         setRoomState((prev) => ({
           ...prev,
-          members: [...prev.members, payload.clientId],
+          members: [...prev.members, payload.client],
         }));
         break;
       }
@@ -171,7 +172,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         const payload = message.payload as UserLeftPayload;
         setRoomState((prev) => ({
           ...prev,
-          members: prev.members.filter((id) => id !== payload.clientId),
+          members: prev.members.filter((m) => m.clientId !== payload.client.clientId),
         }));
         break;
       }
@@ -303,8 +304,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   );
 
   const joinRoom = useCallback(
-    (roomCode: string) => {
-      sendMessage('join-room', { roomCode: roomCode.trim().toUpperCase() });
+    ({ roomCode, name }: JoinRoomPayload) => {
+      sendMessage('join-room', { roomCode: roomCode.trim().toUpperCase(), name });
     },
     [sendMessage]
   );
