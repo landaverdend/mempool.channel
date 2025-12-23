@@ -133,6 +133,7 @@ export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx)
       memberId,
       JSON.stringify({
         type: 'room-message',
+        timestamp: Date.now(),
         payload: {
           roomCode,
           senderId: ws.clientId,
@@ -179,11 +180,7 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
   ctx.broadcastToRoom(roomCode, 'user-left', { roomCode, clientId });
 }
 
-export function closeRoom(
-  roomCode: string,
-  reason: 'host_closed' | 'host_disconnected' | 'all_left',
-  ctx: HandlerContext
-): void {
+export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected' | 'all_left', ctx: HandlerContext): void {
   const { roomManager, clientManager, invoiceManager } = ctx;
 
   const room = roomManager.get(roomCode);

@@ -31,7 +31,7 @@ export function isValidMessage(obj: unknown): obj is Message {
     return false;
   }
   const msg = obj as Record<string, unknown>;
-  return typeof msg.id === 'string' && typeof msg.type === 'string' && typeof msg.timestamp === 'number';
+  return typeof msg.type === 'string' && typeof msg.payload === 'object' && typeof msg.timestamp === 'number';
 }
 
 // Room code utilities
