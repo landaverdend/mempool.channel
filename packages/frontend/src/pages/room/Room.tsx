@@ -8,6 +8,7 @@ import NowPlayingCard from '@/pages/room/NowPlayingCard';
 import HostUploadCard from '@/pages/room/HostUploadCard';
 import RequestSongCard from '@/pages/room/RequestSongCard';
 import ChatboxCard from './ChatboxCard';
+import SongQueueCard from './SongQueueCard';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -76,9 +77,7 @@ export default function Room() {
 
         <RequestSongCard />
 
-        <div className="bg-bg-card rounded-sm p-4">
-          <h2 className="text-lg font-semibold ">Song Queue</h2>
-        </div>
+        <SongQueueCard />
 
         <ChatboxCard />
 
