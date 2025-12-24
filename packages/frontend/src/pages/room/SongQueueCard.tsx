@@ -2,7 +2,8 @@ import { useWebSocket } from '@/contexts/websocketContext';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { Client, ClientRequest } from '@mempool/shared';
 import { SatsIcon } from '@/components/Icons';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SongQueueCard() {
   const { roomState } = useWebSocket();
@@ -14,9 +15,9 @@ export default function SongQueueCard() {
   }, [requestQueue]);
 
   return (
-    <div className="bg-bg-card rounded-sm border border-border h-[400px] flex flex-col">
+    <div className="bg-bg-card rounded-sm h-[400px] flex flex-col">
       <div className="px-4 py-3 border-b border-border">
-        <h2 className="text-sm font-medium text-fg-muted uppercase tracking-wide">Song Pool</h2>
+        <h2 className="text-sm text-fg uppercase tracking-wide">Song Pool</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -25,10 +26,12 @@ export default function SongQueueCard() {
             <span className="text-fg-muted text-sm">Waiting for requests...</span>
           </div>
         ) : (
-          <div className="divide-y divide-border/40">
-            {requestQueue.map((request) => (
-              <SongRow key={request.createdAt} request={request} members={members} maxBid={maxBid} />
-            ))}
+          <div>
+            <AnimatePresence initial={false}>
+              {requestQueue.map((request) => (
+                <SongRow key={request.createdAt} request={request} members={members} maxBid={maxBid} />
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </div>
@@ -63,13 +66,25 @@ function SongRow({ request, members, maxBid }: SongRowProps) {
   const bidPercent = (request.amount / maxBid) * 100;
 
   return (
-    <div className="relative group">
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{
+        layout: { type: 'spring', stiffness: 500, damping: 35 },
+        opacity: { duration: 0.2 },
+        x: { duration: 0.2 },
+      }}
+      className="relative border-b border-border/40 last:border-b-0">
       {/* Fee rate style bar */}
-      <div
-        className="absolute inset-y-0 left-0 animate-[bar-pulse_2s_ease-in-out_infinite] transition-all"
+      <motion.div
+        className="absolute inset-y-0 left-0 animate-[bar-pulse_2s_ease-in-out_infinite]"
+        initial={{ width: 0 }}
+        animate={{ width: `${bidPercent}%` }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         style={{
-          width: `${bidPercent}%`,
-          background: 'linear-gradient(90deg, rgba(85, 75, 69, 0.4) 0%, rgba(0, 125, 61, 0.5) 100%)',
+          background: 'linear-gradient(90deg, rgba(120, 100, 90, 0.5) 0%, rgba(0, 170, 80, 0.6) 100%)',
         }}
       />
 
@@ -98,13 +113,13 @@ function SongRow({ request, members, maxBid }: SongRowProps) {
 
         {/* Bid amount */}
         <div className="flex-shrink-0 text-right">
-          <div className="flex items-center gap-1 text-yellow font-mono text-sm font-semibold">
+          <div className="flex items-center gap-1 text-white text-sm font-semibold">
             <span>{request.amount.toLocaleString()}</span>
             <SatsIcon width={14} height={14} />
           </div>
           <p className="text-[10px] text-fg-muted">{requesterName}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
