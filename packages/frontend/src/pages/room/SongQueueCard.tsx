@@ -7,30 +7,33 @@ export default function SongQueueCard() {
   const { requestQueue } = roomState;
 
   return (
-    <div className="bg-bg-card rounded-sm p-4">
+    <div className="bg-bg-card rounded-sm p-4 h-[400px]">
       <h2 className="text-lg font-semibold mb-4">Song Pool</h2>
 
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th>Song</th>
-            <th>Requested by</th>
-            <th>Amount Bid</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requestQueue.map((request) => (
-            <tr key={request.createdAt}>
-              <td>
-                <VideoMetadata request={request} />
-              </td>
-              <td>{request.requesterId}</td>
-              <td>{request.createdAt}</td>
+      <div className="overflow-y-auto h-[300px]">
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Song</th>
+              <th>Requested by</th>
+              <th>Amount Bid</th>
+              <th>Time</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {requestQueue.map((request) => (
+              <tr key={request.createdAt}>
+                <td>
+                  <VideoMetadata request={request} />
+                </td>
+                <td>{request.requesterId}</td>
+                <td>{request.amount}</td>
+                <td>{request.createdAt}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
