@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../../contexts/websocketContext';
 import Navbar from '../../components/Navbar';
+import QRScannerModal from '../../components/QRScannerModal';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export default function Home() {
   const [name, setName] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const error = localError || wsError;
 
@@ -197,16 +199,28 @@ export default function Home() {
 
                 <div>
                   <label className="block text-sm font-medium text-fg-muted mb-2">NWC Connection String</label>
-                  <input
-                    type="text"
-                    value={nwcUrl}
-                    onChange={(e) => setNwcUrl(e.target.value)}
-                    placeholder="nostr+walletconnect://..."
-                    className="w-full px-4 py-3 bg-bg-input border border-border rounded-lg text-fg placeholder-fg-muted/50 focus:outline-none focus:border-primary transition-colors text-sm"
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateRoom()}
-                    autoFocus
-                    disabled={isLoading}
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={nwcUrl}
+                      onChange={(e) => setNwcUrl(e.target.value)}
+                      placeholder="nostr+walletconnect://..."
+                      className="flex-1 px-4 py-3 bg-bg-input border border-border rounded-lg text-fg placeholder-fg-muted/50 focus:outline-none focus:border-primary transition-colors text-sm"
+                      onKeyDown={(e) => e.key === 'Enter' && handleCreateRoom()}
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsScannerOpen(true)}
+                      disabled={isLoading}
+                      className="px-4 py-3 bg-bg-input border border-border rounded-lg text-fg-muted hover:text-fg hover:border-primary transition-colors disabled:opacity-50 cursor-pointer"
+                      title="Scan QR Code"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                    </button>
+                  </div>
                   <p className="mt-2 text-xs text-fg-muted">Get this from your NWC-compatible wallet (Alby, Mutiny, etc.)</p>
                 </div>
 
@@ -286,6 +300,13 @@ export default function Home() {
           <p className="text-center text-fg-muted/50 text-xs mt-6">Powered by Lightning Network ⚡</p>
         </div>
       </main>
+
+      {/* QR Scanner Modal */}
+      <QRScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={(result) => setNwcUrl(result)}
+      />
     </div>
   );
 }

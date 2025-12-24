@@ -32,6 +32,9 @@ importers:
       framer-motion:
         specifier: ^12.23.26
         version: 12.23.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      html5-qrcode:
+        specifier: ^2.3.8
+        version: 2.3.8
       qrcode.react:
         specifier: ^4.1.0
         version: 4.2.0(react@18.3.1)
@@ -1192,6 +1195,9 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  html5-qrcode@2.3.8:
+    resolution: {integrity: sha512-jsr4vafJhwoLVEDW3n1KvPnCCXWaQfRng0/EEYk1vNcQGcG/htAdhJX0be8YyqMoSz7+hZvOZSTAepsabiuhiQ==}
 
   is-typedarray@1.0.0:
     resolution: {integrity: sha512-cyA56iCMHAh5CdzjJIa4aohJyeO1YbwLi3Jc35MmRU6poroFjIGZzUzupGiRPOjgHg9TLu43xbpwXk523fMxKA==}
@@ -2503,6 +2509,8 @@ snapshots:
       resolve-pkg-maps: 1.0.0
 
   graceful-fs@4.2.11: {}
+
+  html5-qrcode@2.3.8: {}
 
   is-typedarray@1.0.0: {}
 
