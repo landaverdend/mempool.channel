@@ -118,7 +118,7 @@ export default function Home() {
               <div className="space-y-3">
                 <button
                   onClick={() => setMode('create')}
-                  className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 border border-border rounded-lg transition-colors group cursor-pointer">
+                  className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 rounded-lg transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
                       <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,7 +141,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setMode('join')}
-                  className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 border border-border rounded-lg transition-colors group cursor-pointer">
+                  className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 rounded-lg transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                       <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">

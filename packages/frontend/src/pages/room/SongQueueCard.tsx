@@ -2,7 +2,7 @@ import { useWebSocket } from '@/contexts/websocketContext';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { Client, ClientRequest } from '@mempool/shared';
 import { SatsIcon } from '@/components/Icons';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SongQueueCard() {
@@ -17,7 +17,7 @@ export default function SongQueueCard() {
   return (
     <div className="bg-bg-card rounded-sm h-[400px] flex flex-col">
       <div className="px-4 py-3 border-b border-border">
-        <h2 className="text-sm text-fg uppercase tracking-wide">Song Pool</h2>
+        <h2 className="text-lg font-semibold text-fg ">Song Pool</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto">
