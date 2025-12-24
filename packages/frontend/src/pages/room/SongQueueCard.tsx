@@ -1,69 +1,110 @@
 import { useWebSocket } from '@/contexts/websocketContext';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
-import { ClientRequest } from '@mempool/shared';
+import { Client, ClientRequest } from '@mempool/shared';
+import { SatsIcon } from '@/components/Icons';
+import { useMemo } from 'react';
 
 export default function SongQueueCard() {
   const { roomState } = useWebSocket();
-  const { requestQueue } = roomState;
+  const { requestQueue, members } = roomState;
+
+  const maxBid = useMemo(() => {
+    if (requestQueue.length === 0) return 1;
+    return Math.max(...requestQueue.map((r) => r.amount));
+  }, [requestQueue]);
 
   return (
-    <div className="bg-bg-card rounded-sm p-4 h-[400px]">
-      <h2 className="text-lg font-semibold mb-4">Song Pool</h2>
-
-      <div className="overflow-y-auto h-[300px]">
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th>Song</th>
-              <th>Requested by</th>
-              <th>Amount Bid</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requestQueue.map((request) => (
-              <tr key={request.createdAt}>
-                <td>
-                  <VideoMetadata request={request} />
-                </td>
-                <td>{request.requesterId}</td>
-                <td>{request.amount}</td>
-                <td>{request.createdAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="bg-bg-card rounded-sm border border-border h-[400px] flex flex-col">
+      <div className="px-4 py-3 border-b border-border">
+        <h2 className="text-sm font-medium text-fg-muted uppercase tracking-wide">Song Pool</h2>
       </div>
+
+      <div className="flex-1 overflow-y-auto">
+        {requestQueue.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <span className="text-fg-muted text-sm">Waiting for requests...</span>
+          </div>
+        ) : (
+          <div className="divide-y divide-border/40">
+            {requestQueue.map((request) => (
+              <SongRow key={request.createdAt} request={request} members={members} maxBid={maxBid} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {requestQueue.length > 0 && (
+        <div className="px-4 py-2 border-t border-border bg-bg-stat">
+          <div className="flex justify-between text-xs text-fg-muted">
+            <span>{requestQueue.length} pending</span>
+            <span className="font-mono">{requestQueue.reduce((sum, r) => sum + r.amount, 0).toLocaleString()} sats total</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function VideoMetadata({ request }: { request: ClientRequest }) {
-  const { getMetadata } = useYoutubeMetadata();
+type SongRowProps = {
+  request: ClientRequest;
+  members: Client[];
+  maxBid: number;
+};
 
+function SongRow({ request, members, maxBid }: SongRowProps) {
+  const { getMetadata } = useYoutubeMetadata();
   const metadata = getMetadata(request.url);
 
-  if (!metadata) {
-    return <VideoMetadataSkeleton />;
-  }
+  const requesterName = useMemo(() => {
+    const member = members.find((m) => m.clientId === request.requesterId);
+    return member?.name || 'anon';
+  }, [members, request.requesterId]);
+
+  const bidPercent = (request.amount / maxBid) * 100;
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <img src={metadata?.thumbnailUrl} alt={metadata?.title} width={100} height={100} className="rounded-md" />
-      <div>
-        <h3>{metadata?.title}</h3>
-        <p>{metadata?.author}</p>
+    <div className="relative group">
+      {/* Fee rate style bar */}
+      <div
+        className="absolute inset-y-0 left-0 animate-[bar-pulse_2s_ease-in-out_infinite] transition-all"
+        style={{
+          width: `${bidPercent}%`,
+          background: 'linear-gradient(90deg, rgba(85, 75, 69, 0.4) 0%, rgba(0, 125, 61, 0.5) 100%)',
+        }}
+      />
+
+      <div className="relative px-4 py-3 flex items-center gap-3">
+        {/* Thumbnail */}
+        {metadata ? (
+          <img src={metadata.thumbnailUrl} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+        ) : (
+          <div className="w-10 h-10 rounded bg-bg-skeleton animate-pulse flex-shrink-0" />
+        )}
+
+        {/* Song info */}
+        <div className="flex-1 min-w-0">
+          {metadata ? (
+            <>
+              <p className="text-sm text-fg truncate">{metadata.title}</p>
+              <p className="text-xs text-fg-muted truncate">{metadata.author}</p>
+            </>
+          ) : (
+            <>
+              <div className="h-4 w-32 bg-bg-skeleton rounded animate-pulse mb-1" />
+              <div className="h-3 w-20 bg-bg-skeleton rounded animate-pulse" />
+            </>
+          )}
+        </div>
+
+        {/* Bid amount */}
+        <div className="flex-shrink-0 text-right">
+          <div className="flex items-center gap-1 text-yellow font-mono text-sm font-semibold">
+            <span>{request.amount.toLocaleString()}</span>
+            <SatsIcon width={14} height={14} />
+          </div>
+          <p className="text-[10px] text-fg-muted">{requesterName}</p>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function VideoMetadataSkeleton() {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-24 h-24 bg-gray-200/50 rounded-md animate-pulse"></div>
-      <div className="w-full h-2 bg-gray-200/50 rounded-md animate-pulse"></div>
-      <div className="w-full h-2 bg-gray-200/50 rounded-md animate-pulse"></div>
     </div>
   );
 }

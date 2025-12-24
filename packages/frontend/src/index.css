@@ -177,6 +177,17 @@ pre,
   }
 }
 
+/* Song pool bar pulsating animation */
+@keyframes bar-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 /* Current block glowing animation (like mempool.space first block) */
 @keyframes block-glow {
   0%,
