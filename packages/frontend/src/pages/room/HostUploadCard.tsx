@@ -5,12 +5,10 @@ export default function HostUploadCard() {
   const { addRequest } = useWebSocket();
 
   const [videoUrl, setVideoUrl] = useState('');
-  const [amount, setAmount] = useState(0);
 
   const handleUpload = () => {
-    addRequest(videoUrl, amount);
+    addRequest(videoUrl, 0);
     setVideoUrl('');
-    setAmount(0);
   };
 
   return (
@@ -23,13 +21,6 @@ export default function HostUploadCard() {
           placeholder="Video URL"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          className="bg-bg-input text-white rounded-sm p-2"
-        />
-        <input
-          type="text"
-          placeholder="Amount (sats)"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
           className="bg-bg-input text-white rounded-sm p-2"
         />
         <button onClick={handleUpload} className="bg-primary text-white rounded-sm p-2 cursor-pointer">

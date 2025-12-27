@@ -111,12 +111,18 @@ function SongRow({ request, members, maxBid }: SongRowProps) {
           )}
         </div>
 
-        {/* Bid amount */}
+        {/* Bid amount or Host label */}
         <div className="flex-shrink-0 text-right">
-          <div className="flex items-center gap-1 text-white text-sm font-semibold">
-            <span>{request.amount.toLocaleString()}</span>
-            <SatsIcon width={14} height={14} />
-          </div>
+          {request.isHostRequest ? (
+            <div className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-semibold rounded">
+              Host
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-white text-sm font-semibold">
+              <span>{request.amount.toLocaleString()}</span>
+              <SatsIcon width={14} height={14} />
+            </div>
+          )}
           <p className="text-[10px] text-fg-muted">{requesterName}</p>
         </div>
       </div>

@@ -85,6 +85,7 @@ export interface ClientRequest {
   amount: number;
   url: string;
   requesterId: string;
+  isHostRequest?: boolean;
 }
 
 // Shared room info sent to clients (subset of server Room)

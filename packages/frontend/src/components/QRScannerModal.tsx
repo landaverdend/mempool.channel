@@ -18,7 +18,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     if (scannerRef.current) {
       try {
         const state = scannerRef.current.getState();
-        if (state === 2) { // Html5QrcodeScannerState.SCANNING
+        if (state === 2) {
+          // Html5QrcodeScannerState.SCANNING
           await scannerRef.current.stop();
         }
         scannerRef.current.clear();
@@ -109,11 +110,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
 
           {/* Scanner Container */}
           <div className="relative rounded-lg overflow-hidden bg-black">
-            <div
-              id="qr-reader"
-              ref={containerRef}
-              className="w-full aspect-square"
-            />
+            <div id="qr-reader" ref={containerRef} className="w-full aspect-square" />
 
             {/* Scanning indicator overlay */}
             {isScanning && !error && (
@@ -131,17 +128,14 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
           )}
 
           {/* Helper Text */}
-          <p className="text-xs text-fg-muted text-center mt-4">
-            Point your camera at the QR code in your wallet's NWC settings
-          </p>
+          <p className="text-xs text-fg-muted text-center mt-4">Point your camera at the QR code in your wallet's NWC settings</p>
 
           {/* Close Button */}
           <Dialog.Close asChild>
             <button
               onClick={handleClose}
               className="absolute top-4 right-4 text-fg-muted hover:text-fg transition-colors"
-              aria-label="Close"
-            >
+              aria-label="Close">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>

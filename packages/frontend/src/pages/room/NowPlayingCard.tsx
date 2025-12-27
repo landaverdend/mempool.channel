@@ -134,10 +134,16 @@ export default function NowPlayingCard({ currentlyPlaying, isHost, hasQueue }: N
       )}
 
       <div className="flex items-center gap-4 text-sm text-fg-muted">
-        <span className="flex items-center">
-          <span className="font-medium text-fg">{currentlyPlaying.amount}</span>
-          <SatsIcon className="w-5 h-5" />
-        </span>
+        {currentlyPlaying.isHostRequest ? (
+          <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-semibold rounded">
+            Host
+          </span>
+        ) : (
+          <span className="flex items-center">
+            <span className="font-medium text-fg">{currentlyPlaying.amount}</span>
+            <SatsIcon className="w-5 h-5" />
+          </span>
+        )}
         <span>requested by {currentlyPlaying.requesterId}</span>
       </div>
     </div>
