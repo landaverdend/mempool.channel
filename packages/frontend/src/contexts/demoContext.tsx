@@ -76,7 +76,7 @@ function createInitialDemoState(): ClientRoomInfo {
     members: DEMO_MEMBERS,
     currentlyPlaying: {
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      createdAt: Date.now() - 60000,
+      createdAt: Date.now() - 50000,
       requesterId: 'demo_user_1',
       requesterName: 'Alice',
       amount: 6969,
@@ -84,18 +84,18 @@ function createInitialDemoState(): ClientRoomInfo {
     requestQueue: initialQueue,
     playedRequests: [
       {
-        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        createdAt: Date.now() - 60000,
-        requesterId: 'demo_user_1',
-        requesterName: getRandomName(),
-        amount: Math.floor(Math.random() * 5000) + 100,
+        url: 'https://www.youtube.com/watch?v=t-5H-mMXH_4',
+        createdAt: Date.now() - 120000,
+        requesterId: 'demo_user_2',
+        requesterName: 'Bob',
+        amount: 1337,
       },
       {
-        url: 'https://www.youtube.com/watch?v=DsC8jQXRbQE',
-        createdAt: Date.now() - 60000,
-        requesterId: 'demo_user_1',
-        requesterName: getRandomName(),
-        amount: Math.floor(Math.random() * 5000) + 100,
+        url: 'https://www.youtube.com/watch?v=kAjLAyVyWvg',
+        createdAt: Date.now() - 180000,
+        requesterId: 'demo_user_3',
+        requesterName: 'Charlie',
+        amount: 2500,
       },
     ],
   };

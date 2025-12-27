@@ -77,7 +77,13 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
         ))}
 
         {currentlyPlaying && (
-          <RequestItem ref={currentRef} index={0} key={currentlyPlaying.createdAt} request={{ ...currentlyPlaying }} type="current" />
+          <RequestItem
+            ref={currentRef}
+            index={0}
+            key={currentlyPlaying.createdAt}
+            request={{ ...currentlyPlaying }}
+            type="current"
+          />
         )}
 
         {requestQueue.map((request, i) => (
