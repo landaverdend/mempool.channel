@@ -18,7 +18,6 @@ import {
   RoomCreatedPayload,
   HostAwayPayload,
 } from '@mempool/shared';
-import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES } from '@/lib/mock-data';
 
 // LocalStorage keys for host session recovery
 const HOST_TOKEN_KEY = 'mempool_host_token';
@@ -48,14 +47,6 @@ function getHostSession(): { roomCode: string; hostToken: string; name: string }
   }
   return null;
 }
-
-// Dev mode: enable with ?dev query param or VITE_DEV_MODE env var
-const isDevMode = () => {
-  if (typeof window !== 'undefined') {
-    return new URLSearchParams(window.location.search).has('dev');
-  }
-  return false;
-};
 
 export interface RoomMessage {
   id: string;
@@ -124,14 +115,13 @@ const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 const WEBSOCKET_URL = 'ws://localhost:8080';
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
-  const [devMode] = useState(isDevMode);
-  const [connected, setConnected] = useState(devMode);
+  const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [clientId, setClientId] = useState<string | null>(devMode ? 'dev_client_123' : null);
+  const [clientId, setClientId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [roomState, setRoomState] = useState<ClientRoomInfo>(devMode ? MOCK_ROOM_STATE : EMPTY_ROOM_STATE);
-  const [roomMessages, setRoomMessages] = useState<RoomMessage[]>(devMode ? MOCK_ROOM_MESSAGES : []);
+  const [roomState, setRoomState] = useState<ClientRoomInfo>(EMPTY_ROOM_STATE);
+  const [roomMessages, setRoomMessages] = useState<RoomMessage[]>([]);
   const [invoiceState, setInvoiceState] = useState<InvoiceState>({
     invoice: null,
     loading: false,
@@ -142,13 +132,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const wsRef = useRef<WebSocket | null>(null);
   const clientIdRef = useRef<string | null>(null);
   const pendingRejoinRef = useRef<boolean>(false);
-
-  // Log dev mode status
-  useEffect(() => {
-    if (devMode) {
-      console.log('%c[DEV MODE] Using mock data', 'color: #00ff00; font-weight: bold');
-    }
-  }, [devMode]);
 
   // Keep clientIdRef in sync
   useEffect(() => {
@@ -311,7 +294,6 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const connect = useCallback(() => {
-    if (devMode) return; // Skip connection in dev mode
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const socket = new WebSocket(WEBSOCKET_URL);
@@ -356,7 +338,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     };
 
     wsRef.current = socket;
-  }, [devMode, handleMessage]);
+  }, [handleMessage]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -428,28 +410,13 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const sendRoomMessage = useCallback(
     (content: string) => {
       if (roomState.roomCode && content.trim()) {
-        if (devMode) {
-          // Add message locally in dev mode
-          setRoomMessages((prev) => [
-            ...prev,
-            {
-              id: `msg_${Date.now()}`,
-              senderId: clientId || 'dev_client',
-              senderName: 'dev_client',
-              content: content.trim(),
-              isHost: roomState.isHost,
-              timestamp: Date.now(),
-            },
-          ]);
-          return;
-        }
         sendMessage('room-message', {
           roomCode: roomState.roomCode,
           content: content.trim(),
         });
       }
     },
-    [sendMessage, roomState.roomCode, devMode, clientId, roomState.isHost]
+    [sendMessage, roomState.roomCode, clientId, roomState.isHost]
   );
 
   const playNext = useCallback(() => {

@@ -8,11 +8,12 @@ const DEMO_CLIENT_ID = 'demo_host_123';
 
 // Sample YouTube videos for demo
 const DEMO_VIDEOS = [
-  { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up' },
-  { url: 'https://www.youtube.com/watch?v=xIthgcx-axs', title: 'Lofi Hip Hop Radio' },
-  { url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', title: 'Me at the zoo' },
-  { url: 'https://www.youtube.com/watch?v=9bZkp7q19f0', title: 'PSY - Gangnam Style' },
-  { url: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito' },
+  { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  { url: 'https://www.youtube.com/watch?v=DsC8jQXRbQE' },
+  { url: 'https://www.youtube.com/watch?v=hE66C4cUJJY' },
+  { url: 'https://www.youtube.com/watch?v=an1IV6Oyvuc' },
+  { url: 'https://www.youtube.com/watch?v=t-5H-mMXH_4' },
+  { url: 'https://www.youtube.com/watch?v=kAjLAyVyWvg' },
 ];
 
 const DEMO_MEMBERS = [
@@ -47,21 +48,21 @@ function generateDemoRequest(requesterName?: string): ClientRequest {
 function createInitialDemoState(): ClientRoomInfo {
   const initialQueue: ClientRequest[] = [
     {
-      url: 'https://www.youtube.com/watch?v=xIthgcx-axs',
+      url: 'https://www.youtube.com/watch?v=DsC8jQXRbQE',
       createdAt: Date.now() - 30000,
       requesterId: 'demo_user_1',
       requesterName: 'Alice',
       amount: 2100,
     },
     {
-      url: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
+      url: 'https://www.youtube.com/watch?v=hE66C4cUJJY',
       createdAt: Date.now() - 20000,
       requesterId: 'demo_user_2',
       requesterName: 'Bob',
       amount: 1500,
     },
     {
-      url: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
+      url: 'https://www.youtube.com/watch?v=an1IV6Oyvuc',
       createdAt: Date.now() - 10000,
       requesterId: 'demo_user_3',
       requesterName: 'Charlie',
@@ -78,10 +79,25 @@ function createInitialDemoState(): ClientRoomInfo {
       createdAt: Date.now() - 60000,
       requesterId: 'demo_user_1',
       requesterName: 'Alice',
-      amount: 3000,
+      amount: 6969,
     },
     requestQueue: initialQueue,
-    playedRequests: [],
+    playedRequests: [
+      {
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        createdAt: Date.now() - 60000,
+        requesterId: 'demo_user_1',
+        requesterName: getRandomName(),
+        amount: Math.floor(Math.random() * 5000) + 100,
+      },
+      {
+        url: 'https://www.youtube.com/watch?v=DsC8jQXRbQE',
+        createdAt: Date.now() - 60000,
+        requesterId: 'demo_user_1',
+        requesterName: getRandomName(),
+        amount: Math.floor(Math.random() * 5000) + 100,
+      },
+    ],
   };
 }
 
@@ -107,7 +123,7 @@ function createInitialDemoMessages(): RoomMessage[] {
       id: 'demo_msg_3',
       senderId: 'demo_user_2',
       senderName: 'Bob',
-      content: 'Love this song!',
+      content: 'This joke is so funny and never gets old! Play it again!',
       isHost: false,
       timestamp: Date.now() - 30000,
     },
@@ -217,9 +233,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       if (prev.requestQueue.length === 0) return prev;
 
       const [nextSong, ...remainingQueue] = prev.requestQueue;
-      const playedRequests = prev.currentlyPlaying
-        ? [prev.currentlyPlaying, ...prev.playedRequests]
-        : prev.playedRequests;
+      const playedRequests = prev.currentlyPlaying ? [prev.currentlyPlaying, ...prev.playedRequests] : prev.playedRequests;
 
       return {
         ...prev,

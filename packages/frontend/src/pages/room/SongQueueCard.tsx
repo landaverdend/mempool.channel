@@ -91,9 +91,9 @@ function SongRow({ request, members, maxBid }: SongRowProps) {
       <div className="relative px-4 py-3 flex items-center gap-3">
         {/* Thumbnail */}
         {metadata ? (
-          <img src={metadata.thumbnailUrl} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+          <img src={metadata.thumbnailUrl} alt="" className="w-10 h-10 rounded object-cover shrink-0" />
         ) : (
-          <div className="w-10 h-10 rounded bg-bg-skeleton animate-pulse flex-shrink-0" />
+          <div className="w-10 h-10 rounded bg-bg-skeleton animate-pulse shrink-0" />
         )}
 
         {/* Song info */}
@@ -112,7 +112,7 @@ function SongRow({ request, members, maxBid }: SongRowProps) {
         </div>
 
         {/* Bid amount or Host label */}
-        <div className="flex-shrink-0 text-right">
+        <div className="shrink-0 text-right">
           {request.isHostRequest ? (
             <div className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-semibold rounded">
               Host

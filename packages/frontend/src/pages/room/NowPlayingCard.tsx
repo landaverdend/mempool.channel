@@ -144,7 +144,7 @@ export default function NowPlayingCard({ currentlyPlaying, isHost, hasQueue }: N
             <SatsIcon className="w-5 h-5" />
           </span>
         )}
-        <span>requested by {currentlyPlaying.requesterId}</span>
+        <span>requested by {currentlyPlaying.requesterName}</span>
       </div>
     </div>
   );
