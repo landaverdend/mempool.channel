@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../../contexts/websocketContext';
 import Navbar from '../../components/Navbar';
 import QRScannerModal from '../../components/QRScannerModal';
+import { JoinIcon, RightArrowIcon } from '@/components/Icons';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -132,13 +133,7 @@ export default function Home() {
                       <div className="text-sm text-fg-muted">Connect your wallet and share the code</div>
                     </div>
                   </div>
-                  <svg
-                    className="w-5 h-5 text-fg-muted group-hover:text-fg transition-colors"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <RightArrowIcon />
                 </button>
 
                 <button
@@ -146,27 +141,14 @@ export default function Home() {
                   className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 rounded-lg transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                        />
-                      </svg>
+                      <JoinIcon className="ml-1" />
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-fg">Join a Room</div>
                       <div className="text-sm text-fg-muted">Enter a 6-character room code</div>
                     </div>
                   </div>
-                  <svg
-                    className="w-5 h-5 text-fg-muted group-hover:text-fg transition-colors"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <RightArrowIcon />
                 </button>
               </div>
             </div>
