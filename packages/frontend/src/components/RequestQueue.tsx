@@ -1,5 +1,5 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useCallback } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { SatsIcon } from './Icons';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
@@ -9,11 +9,47 @@ type RequestQueueProps = {
 };
 export function RequestQueue({ roomState }: RequestQueueProps) {
   const { requestQueue, playedRequests, currentlyPlaying } = roomState;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   const isEmpty = requestQueue.length === 0 && playedRequests.length === 0 && currentlyPlaying === null;
 
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging || !scrollRef.current) return;
+      e.preventDefault();
+      const x = e.pageX - scrollRef.current.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      scrollRef.current.scrollLeft = scrollLeft - walk;
+    },
+    [isDragging, startX, scrollLeft]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   return (
-    <div className="w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4">
+    <div
+      ref={scrollRef}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4 select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
       <div className="flex flex-row gap-3 sm:gap-4 justify-center">
         {isEmpty && <div className="text-fg-muted text-3xl sm:text-4xl font-bold mt-4">No requests in queue</div>}
 
