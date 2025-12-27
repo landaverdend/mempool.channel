@@ -25,6 +25,12 @@ Install dependencies:
 pnpm install
 ```
 
+(if you made changes to the shared library)
+```bash
+pnpm build
+```
+
+
 Run both frontend and server in development mode:
 
 ```bash
