@@ -196,17 +196,7 @@ export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_discon
   invoiceManager.stopPolling(roomCode);
 
   // Notify all members before deleting
-  const members = roomManager.getMembers(roomCode);
-  members.forEach((memberId) => {
-    clientManager.clearRoom(memberId);
-    clientManager.send(
-      memberId,
-      JSON.stringify({
-        type: 'room-closed',
-        payload: { roomCode, reason },
-      })
-    );
-  });
+  ctx.broadcastToRoom(roomCode, createMessage('room-closed', { roomCode, reason }));
 
   // Delete room (this cleans up NWC client and interval)
   roomManager.delete(roomCode);
