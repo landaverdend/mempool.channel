@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useWebSocket } from '../../contexts/websocketContext';
+import { useParams } from 'react-router-dom';
+import { useRoom } from '@/hooks/useRoom';
 import InvoiceRequestModal from '../../components/InvoiceRequestModal';
 import { RequestQueue } from '@/components/RequestQueue';
 import RoomHeader from '@/pages/room/RoomHeader';
@@ -13,12 +13,13 @@ import JoinRoomForm from './JoinRoomForm';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const { connected, roomState, invoiceState, error, makeRequest, clearError, joinRoom } = useWebSocket();
+  const { isDemoMode, connected, roomState, invoiceState, error, makeRequest, clearError } = useRoom();
 
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   // Check if we need to show the join form (local state not in sync with server)
-  const needsToJoin = roomCode && !roomState.roomCode;
+  // In demo mode, we never need to join
+  const needsToJoin = !isDemoMode && roomCode && !roomState.roomCode;
 
   // Close modal when invoice is generated
   useEffect(() => {

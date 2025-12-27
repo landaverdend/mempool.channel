@@ -178,7 +178,7 @@ function RequestBlock({ request, type }: RequestItemProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-fg-muted">Requested by</span>
-              <span className="font-medium">{request.requesterId}</span>
+              <span className="font-medium">{request.requesterName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-fg-muted">Time</span>

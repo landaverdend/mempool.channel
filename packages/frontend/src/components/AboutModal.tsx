@@ -75,7 +75,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <h4 className="text-sm font-semibold text-fg uppercase tracking-wide">How It Works</h4>
             <div className="space-y-2">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs font-medium text-title-purple">1</span>
                 </div>
                 <p className="text-sm text-fg-muted">
@@ -83,7 +83,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs font-medium text-title-purple">2</span>
                 </div>
                 <p className="text-sm text-fg-muted">
@@ -91,7 +91,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-tertiary/30 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs font-medium text-title-purple">3</span>
                 </div>
                 <p className="text-sm text-fg-muted">

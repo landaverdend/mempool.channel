@@ -1,4 +1,4 @@
-import { useWebSocket } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { Client, ClientRequest } from '@mempool/shared';
 import { SatsIcon } from '@/components/Icons';
@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SongQueueCard() {
-  const { roomState } = useWebSocket();
+  const { roomState } = useRoom();
   const { requestQueue, members } = roomState;
 
   const maxBid = useMemo(() => {

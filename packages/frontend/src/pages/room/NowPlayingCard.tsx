@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import YouTube, { YouTubeEvent } from 'react-youtube';
 import { ClientRequest } from '@mempool/shared';
-import { useWebSocket } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
 import { SatsIcon } from '@/components/Icons';
 import { getYouTubeVideoId } from '@/lib/yt-utils';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
@@ -13,7 +13,7 @@ type NowPlayingProps = {
 };
 
 export default function NowPlayingCard({ currentlyPlaying, isHost, hasQueue }: NowPlayingProps) {
-  const { playNext, roomState } = useWebSocket();
+  const { playNext, roomState } = useRoom();
   const { getMetadata } = useYoutubeMetadata();
 
   // Use refs to get latest values in callbacks

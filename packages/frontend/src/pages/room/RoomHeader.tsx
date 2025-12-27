@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useWebSocket } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
 import { ClientRoomInfo } from '@mempool/shared';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 
 type RoomHeaderProps = {
@@ -9,8 +8,7 @@ type RoomHeaderProps = {
 };
 
 export default function RoomHeader({ roomState }: RoomHeaderProps) {
-  const { leaveRoom, closeRoom } = useWebSocket();
-  const navigate = useNavigate();
+  const { leaveRoom, closeRoom, isDemoMode } = useRoom();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +24,7 @@ export default function RoomHeader({ roomState }: RoomHeaderProps) {
     } else {
       leaveRoom();
     }
-    navigate('/');
+    // Navigation is handled inside leaveRoom/closeRoom
   };
 
   // Close menu when clicking outside
@@ -45,6 +43,11 @@ export default function RoomHeader({ roomState }: RoomHeaderProps) {
       {/* Desktop view */}
       <div className="hidden sm:flex items-center gap-4">
         <div className="flex items-center gap-2">
+          {isDemoMode && (
+            <span className="text-xs bg-gradient-to-r from-tertiary to-primary text-white px-2 py-0.5 rounded font-semibold animate-pulse">
+              DEMO
+            </span>
+          )}
           <span
             className="font-mono text-lg text-link cursor-pointer hover:text-info transition-colors"
             onClick={copyRoomCode}
@@ -94,9 +97,16 @@ export default function RoomHeader({ roomState }: RoomHeaderProps) {
             <div className="p-3 border-b border-border">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-fg-muted">Room Code</span>
-                {roomState.isHost && (
-                  <span className="text-xs bg-tertiary text-white px-2 py-0.5 rounded font-semibold">HOST</span>
-                )}
+                <div className="flex items-center gap-1">
+                  {isDemoMode && (
+                    <span className="text-xs bg-gradient-to-r from-tertiary to-primary text-white px-2 py-0.5 rounded font-semibold animate-pulse">
+                      DEMO
+                    </span>
+                  )}
+                  {roomState.isHost && (
+                    <span className="text-xs bg-tertiary text-white px-2 py-0.5 rounded font-semibold">HOST</span>
+                  )}
+                </div>
               </div>
               <button
                 onClick={copyRoomCode}

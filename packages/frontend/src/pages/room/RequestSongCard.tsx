@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useWebSocket } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 import { getYouTubeVideoId, validateYouTubeVideo } from '@/lib/yt-utils';
 import { isValidUrl } from '@/lib/utils';
 import { SatsIcon } from '@/components/Icons';
 import InvoiceModal from '@/components/InvoiceModal';
 
-const PRESET_AMOUNTS = [10, 21, 100, 500];
+const PRESET_AMOUNTS = [10, 21, 42, 420];
 
 export default function RequestSongCard() {
-  const { roomState, makeRequest, invoiceState, clearInvoice } = useWebSocket();
+  const { roomState, makeRequest, invoiceState, clearInvoice, isDemoMode } = useRoom();
   const { getMetadata, prefetchMetadata } = useYoutubeMetadata();
 
   const [url, setUrl] = useState('');
@@ -68,6 +68,21 @@ export default function RequestSongCard() {
     }
 
     setIsValidating(false);
+
+    // In demo mode, add song directly without invoice
+    if (isDemoMode) {
+      makeRequest({
+        roomCode: roomState.roomCode,
+        amount: amountNum,
+        url: url.trim(),
+      });
+      // Clear form after successful demo request
+      setUrl('');
+      setAmount('');
+      return;
+    }
+
+    // In real mode, show invoice modal
     setSubmittedAmount(amountNum);
     setShowInvoiceModal(true);
     clearInvoice();
@@ -184,7 +199,13 @@ export default function RequestSongCard() {
         </button>
 
         {/* Helper Text */}
-        <p className="text-xs text-fg-muted text-center">Higher amounts get priority in the queue</p>
+        <p className="text-xs text-fg-muted text-center">
+          {isDemoMode ? (
+            <span className="text-tertiary">Demo mode - requests are simulated</span>
+          ) : (
+            'Higher amounts get priority in the queue'
+          )}
+        </p>
       </div>
 
       {/* Invoice Modal */}

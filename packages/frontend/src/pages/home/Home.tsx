@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../../contexts/websocketContext';
+import { useDemo } from '../../contexts/demoContext';
 import Navbar from '../../components/Navbar';
 import QRScannerModal from '../../components/QRScannerModal';
 import AboutModal from '../../components/AboutModal';
@@ -10,6 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const { connected, createRoom, joinRoom, roomState, error: wsError, clearError } = useWebSocket();
+  const { enterDemoMode, exitDemoMode } = useDemo();
   const [mode, setMode] = useState<'select' | 'create' | 'join'>('select');
   const [joinCode, setJoinCode] = useState('');
   const [nwcUrl, setNwcUrl] = useState('');
@@ -78,6 +80,12 @@ export default function Home() {
     clearError();
   };
 
+  const handleStartDemo = () => {
+    exitDemoMode(); // Reset any existing demo state
+    enterDemoMode();
+    navigate('/room/DEMO42');
+  };
+
   // Loading/connecting state
   if (!connected) {
     return (
@@ -116,10 +124,16 @@ export default function Home() {
               <h1 className="text-xl sm:text-2xl font-semibold text-fg mb-2">
                 Welcome to mempool<span className="text-title-purple">.channel</span>
               </h1>
-              <p className="text-fg-muted text-sm sm:text-base mb-8">
-                Host a listening party or join an existing room to queue songs with Lightning payments.
-              </p>
-
+              <div className="flex flex-col items-center justify-between">
+                <p className="text-fg-muted text-sm sm:text-base mb-8">
+                  Host a listening party or join an existing room to queue songs with Lightning payments.
+                  <button
+                    onClick={() => setIsAboutOpen(true)}
+                    className="text-link hover:text-info transition-colors cursor-pointer hover:underline ml-1">
+                    Read More
+                  </button>
+                </p>
+              </div>
               <div className="space-y-3">
                 <button
                   onClick={() => setMode('create')}
@@ -148,6 +162,43 @@ export default function Home() {
                     <div className="text-left">
                       <div className="font-medium text-fg">Join a Room</div>
                       <div className="text-sm text-fg-muted">Enter a 6-character room code</div>
+                    </div>
+                  </div>
+                  <RightArrowIcon />
+                </button>
+
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-bg-card px-2 text-fg-muted">or</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleStartDemo}
+                  className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 border border-dashed border-tertiary/30 rounded-lg transition-colors group cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-tertiary/20 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-fg">Try Demo</div>
+                      <div className="text-sm text-fg-muted">Explore the app with simulated activity</div>
                     </div>
                   </div>
                   <RightArrowIcon />
@@ -286,8 +337,7 @@ export default function Home() {
 
           {/* Footer info */}
           <p className="text-center text-fg-muted/50 text-xs mt-6">
-            Powered by Lightning Network ⚡{' '}
-            <span className="mx-1">·</span>
+            Powered by Lightning Network ⚡ <span className="mx-1">·</span>
             <button
               onClick={() => setIsAboutOpen(true)}
               className="text-fg-muted/50 hover:text-fg-muted transition-colors cursor-pointer">

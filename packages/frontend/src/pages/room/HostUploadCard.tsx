@@ -1,9 +1,9 @@
-import { useWebSocket } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
 import { useState } from 'react';
 import { validateYouTubeVideo } from '@/lib/yt-utils';
 
 export default function HostUploadCard() {
-  const { addRequest } = useWebSocket();
+  const { addRequest } = useRoom();
 
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState<string | null>(null);

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { useWebSocket, RoomMessage } from '@/contexts/websocketContext';
+import { useRoom } from '@/hooks/useRoom';
+import { RoomMessage } from '@/contexts/websocketContext';
 
 export default function ChatboxCard() {
-  const { roomMessages, sendRoomMessage, clientId } = useWebSocket();
+  const { roomMessages, sendRoomMessage, clientId } = useRoom();
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
