@@ -407,6 +407,9 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const leaveRoom = useCallback(() => {
     if (roomState.roomCode) {
       sendMessage('leave-room', { roomCode: roomState.roomCode });
+      // Clear state immediately to prevent race condition with Home navigation
+      setRoomState(EMPTY_ROOM_STATE);
+      setRoomMessages([]);
     }
   }, [sendMessage, roomState.roomCode]);
 
@@ -415,14 +418,16 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       // Clear host session before closing (explicit close)
       clearHostSession();
       sendMessage('close-room', { roomCode: roomState.roomCode });
+      // Clear state immediately to prevent race condition with Home navigation
+      setRoomState(EMPTY_ROOM_STATE);
+      setRoomMessages([]);
+      setHostAway(false);
     }
   }, [sendMessage, roomState.roomCode, roomState.isHost]);
 
   const sendRoomMessage = useCallback(
     (content: string) => {
       if (roomState.roomCode && content.trim()) {
-
-
         if (devMode) {
           // Add message locally in dev mode
           setRoomMessages((prev) => [

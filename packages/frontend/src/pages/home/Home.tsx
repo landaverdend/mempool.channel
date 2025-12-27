@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../../contexts/websocketContext';
 import Navbar from '../../components/Navbar';
 import QRScannerModal from '../../components/QRScannerModal';
+import AboutModal from '../../components/AboutModal';
 import { JoinIcon, RightArrowIcon } from '@/components/Icons';
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const error = localError || wsError;
 
@@ -83,7 +85,7 @@ export default function Home() {
         <div className="text-center">
           <div className="mb-6">
             <span className="text-3xl sm:text-4xl font-bold text-fg">mempool</span>
-            <span className="text-3xl sm:text-4xl font-bold text-tertiary">.band</span>
+            <span className="text-3xl sm:text-4xl font-bold text-tertiary">.channel</span>
           </div>
           <div className="flex items-center justify-center gap-2 text-fg-muted">
             <div className="w-2 h-2 bg-tertiary rounded-full animate-pulse" />
@@ -112,7 +114,7 @@ export default function Home() {
           {mode === 'select' && (
             <div className="bg-bg-card rounded-lg p-6 sm:p-8">
               <h1 className="text-xl sm:text-2xl font-semibold text-fg mb-2">
-                Welcome to mempool<span className="text-title-purple">.music</span>
+                Welcome to mempool<span className="text-title-purple">.channel</span>
               </h1>
               <p className="text-fg-muted text-sm sm:text-base mb-8">
                 Host a listening party or join an existing room to queue songs with Lightning payments.
@@ -283,12 +285,21 @@ export default function Home() {
           )}
 
           {/* Footer info */}
-          <p className="text-center text-fg-muted/50 text-xs mt-6">Powered by Lightning Network ⚡</p>
+          <p className="text-center text-fg-muted/50 text-xs mt-6">
+            Powered by Lightning Network ⚡{' '}
+            <span className="mx-1">·</span>
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className="text-fg-muted/50 hover:text-fg-muted transition-colors cursor-pointer">
+              About
+            </button>
+          </p>
         </div>
       </main>
 
-      {/* QR Scanner Modal */}
+      {/* Modals */}
       <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={(result) => setNwcUrl(result)} />
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );
 }

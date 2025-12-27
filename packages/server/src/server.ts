@@ -56,7 +56,7 @@ export class MempoolBandServer {
 
       // Send welcome message with client ID
       this.sendMessage(extWs, 'data', {
-        message: 'Welcome to Mempool Band WebSocket Server!',
+        message: 'Welcome to Mempool Channel WebSocket Server!',
         clientId: extWs.clientId,
       });
 

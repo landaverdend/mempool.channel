@@ -59,7 +59,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               <img src="/btc_jukebox.png" alt="mempool.music logo" className="w-12 h-16" />
               <div>
                 <h3 className="text-xl font-medium text-fg">
-                  mempool<span className="text-title-purple">.music</span>
+                  mempool<span className="text-title-purple">.channel</span>
                 </h3>
                 <p className="text-sm text-fg-muted">Lightning-powered jukebox</p>
               </div>

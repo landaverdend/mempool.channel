@@ -259,7 +259,7 @@ export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_discon
   invoiceManager.stopPolling(roomCode);
 
   // Notify all members before deleting
-  ctx.broadcastToRoom(roomCode, createMessage('room-closed', { roomCode, reason }));
+  ctx.broadcastToRoom(roomCode, createMessage('room-closed', { roomCode, reason }), room.hostId || '');
 
   // Delete room (this cleans up NWC client and interval)
   roomManager.delete(roomCode);

@@ -6,7 +6,7 @@ import { isValidUrl } from '@/lib/utils';
 import { SatsIcon } from '@/components/Icons';
 import InvoiceModal from '@/components/InvoiceModal';
 
-const PRESET_AMOUNTS = [100, 500, 1000, 5000];
+const PRESET_AMOUNTS = [10, 21, 100, 500];
 
 export default function RequestSongCard() {
   const { roomState, makeRequest, invoiceState, clearInvoice } = useWebSocket();
