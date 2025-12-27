@@ -112,7 +112,21 @@ interface WebSocketContextValue {
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 
-const WEBSOCKET_URL = 'ws://localhost:8080';
+// Use environment variable or derive from current host in production
+const getWebSocketUrl = (): string => {
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
+  // In production, use same host with appropriate protocol
+  if (import.meta.env.PROD) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}`;
+  }
+  // Development default
+  return 'ws://localhost:8080';
+};
+
+const WEBSOCKET_URL = getWebSocketUrl();
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);

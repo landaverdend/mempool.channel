@@ -1,13 +1,23 @@
 import { WebSocketServer, WebSocket } from 'ws';
+import { createServer, Server as HttpServer } from 'http';
+import express, { Application } from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { createMessage, parseMessage, serializeMessage, generateId, MessageType, Message } from '@mempool/shared';
 import { ClientManager, RoomManager, InvoiceManager, ExtendedWebSocket } from './managers/index.js';
 import { handlers, handleDisconnect, HandlerContext } from './handlers/index.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export interface ServerOptions {
   port: number;
+  staticDir?: string;
 }
 
 export class MempoolBandServer {
+  private app: Application;
+  private httpServer: HttpServer;
   private wss: WebSocketServer;
 
   private clientManager: ClientManager;
@@ -39,11 +49,33 @@ export class MempoolBandServer {
     );
     this.ctx.invoiceManager = this.invoiceManager;
 
-    // Create WebSocket server
-    this.wss = new WebSocketServer({ port: options.port });
+    // Create Express app
+    this.app = express();
+
+    // Serve static files if staticDir is provided
+    if (options.staticDir) {
+      const staticPath = path.resolve(options.staticDir);
+      console.log(`Serving static files from: ${staticPath}`);
+      this.app.use(express.static(staticPath));
+
+      // SPA fallback - serve index.html for all non-API routes (Express 5 syntax)
+      this.app.get('/{*splat}', (req, res) => {
+        res.sendFile(path.join(staticPath, 'index.html'));
+      });
+    }
+
+    // Create HTTP server
+    this.httpServer = createServer(this.app);
+
+    // Create WebSocket server attached to HTTP server
+    this.wss = new WebSocketServer({ server: this.httpServer });
     this.setupEventHandlers();
 
-    console.log(`WebSocket server started on ws://localhost:${options.port}`);
+    // Start listening
+    this.httpServer.listen(options.port, () => {
+      console.log(`Server started on http://localhost:${options.port}`);
+      console.log(`WebSocket available at ws://localhost:${options.port}`);
+    });
   }
 
   private setupEventHandlers(): void {
@@ -167,8 +199,10 @@ export class MempoolBandServer {
     return new Promise((resolve) => {
       console.log('Shutting down server...');
       this.wss.close(() => {
-        console.log('Server closed');
-        resolve();
+        this.httpServer.close(() => {
+          console.log('Server closed');
+          resolve();
+        });
       });
     });
   }

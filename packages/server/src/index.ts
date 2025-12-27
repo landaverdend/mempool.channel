@@ -1,8 +1,12 @@
 import { MempoolBandServer } from './server.js';
 
-const PORT = 8080;
+const PORT = parseInt(process.env.PORT || '8080', 10);
+const STATIC_DIR = process.env.STATIC_DIR;
 
-const server = new MempoolBandServer({ port: PORT });
+const server = new MempoolBandServer({
+  port: PORT,
+  staticDir: STATIC_DIR,
+});
 
 // Handle server shutdown
 process.on('SIGINT', async () => {
