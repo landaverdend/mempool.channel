@@ -1,5 +1,5 @@
 import { ClientRequest, ClientRoomInfo } from '@mempool/shared';
-import { useMemo, useRef, useState, useCallback } from 'react';
+import { useMemo, useRef, useState, useCallback, useEffect, forwardRef } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { SatsIcon } from './Icons';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
@@ -10,11 +10,30 @@ type RequestQueueProps = {
 export function RequestQueue({ roomState }: RequestQueueProps) {
   const { requestQueue, playedRequests, currentlyPlaying } = roomState;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const currentRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasScrolledOnLoad, setHasScrolledOnLoad] = useState(false);
 
   const isEmpty = requestQueue.length === 0 && playedRequests.length === 0 && currentlyPlaying === null;
+
+  // Scroll to currently playing element on initial load
+  useEffect(() => {
+    if (hasScrolledOnLoad || !currentlyPlaying || !currentRef.current || !scrollRef.current) return;
+
+    const container = scrollRef.current;
+    const element = currentRef.current;
+
+    // Calculate scroll position to center the element horizontally
+    const elementLeft = element.offsetLeft;
+    const elementWidth = element.offsetWidth;
+    const containerWidth = container.offsetWidth;
+    const scrollTo = elementLeft - containerWidth / 2 + elementWidth / 2;
+
+    container.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    setHasScrolledOnLoad(true);
+  }, [currentlyPlaying, hasScrolledOnLoad]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -58,7 +77,7 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
         ))}
 
         {currentlyPlaying && (
-          <RequestItem index={0} key={currentlyPlaying.createdAt} request={{ ...currentlyPlaying }} type="current" />
+          <RequestItem ref={currentRef} index={0} key={currentlyPlaying.createdAt} request={{ ...currentlyPlaying }} type="current" />
         )}
 
         {requestQueue.map((request, i) => (
@@ -71,14 +90,13 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
 
 type RequestItemProps = {
   request: ClientRequest;
-
   type: 'played' | 'current' | 'pending';
   index: number;
 };
 
-function RequestItem({ request, type, index }: RequestItemProps) {
+const RequestItem = forwardRef<HTMLDivElement, RequestItemProps>(({ request, type, index }, ref) => {
   return (
-    <div className="flex flex-col items-center gap-7 pt-4 pl-4 sm:pl-6 shrink-0">
+    <div ref={ref} className="flex flex-col items-center gap-7 pt-4 pl-4 sm:pl-6 shrink-0">
       <span className={`text-md sm:text-lg text-link font-semibold pr-4 sm:pr-6  ${type === 'played' ? 'visible' : 'invisible'}`}>
         {index + 1}
       </span>
@@ -86,7 +104,7 @@ function RequestItem({ request, type, index }: RequestItemProps) {
       <span className="text-xs sm:text-lg font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterId}</span>
     </div>
   );
-}
+});
 
 function RequestBlock({ request, type }: RequestItemProps) {
   const { getMetadata } = useYoutubeMetadata();

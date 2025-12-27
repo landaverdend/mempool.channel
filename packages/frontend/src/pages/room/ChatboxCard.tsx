@@ -9,7 +9,9 @@ export default function ChatboxCard() {
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!messagesContainerRef.current) return;
+    const container = messagesContainerRef.current;
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }, [roomMessages]);
 
   const handleSend = () => {
