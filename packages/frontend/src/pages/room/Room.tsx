@@ -9,22 +9,16 @@ import HostUploadCard from '@/pages/room/HostUploadCard';
 import RequestSongCard from '@/pages/room/RequestSongCard';
 import ChatboxCard from './ChatboxCard';
 import SongQueueCard from './SongQueueCard';
+import JoinRoomForm from './JoinRoomForm';
 
 export default function Room() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const navigate = useNavigate();
-  const { connected, roomState, invoiceState, error, makeRequest, clearError } = useWebSocket();
+  const { connected, roomState, invoiceState, error, makeRequest, clearError, joinRoom } = useWebSocket();
 
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-  // Redirect to home if not in this room
-  useEffect(() => {
-    if (!roomState.roomCode) {
-      navigate('/');
-    } else if (roomState.roomCode !== roomCode) {
-      navigate(`/room/${roomState.roomCode}`);
-    }
-  }, [roomState.roomCode, roomCode, navigate]);
+  // Check if we need to show the join form (local state not in sync with server)
+  const needsToJoin = roomCode && !roomState.roomCode;
 
   // Close modal when invoice is generated
   useEffect(() => {
@@ -40,16 +34,22 @@ export default function Room() {
 
   if (!connected) {
     return (
-      <div className="min-h-screen bg-slate-900 text-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-bg text-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400">Reconnecting...</p>
+          <div className="w-4 h-4 border-2 border-fg/30 border-t-fg rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-fg-muted">Connecting...</p>
         </div>
       </div>
     );
   }
 
+  // Show join form if user needs to join
+  if (needsToJoin) {
+    return <JoinRoomForm />;
+  }
+
   if (!roomState.roomCode) {
-    return null; // Will redirect via useEffect
+    return null;
   }
 
   return (

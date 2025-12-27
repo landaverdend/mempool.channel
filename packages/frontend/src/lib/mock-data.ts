@@ -10,22 +10,24 @@ const members: Client[] = [
 const generateMockRequests = (clients: Client[], count: number = 10) => {
   const requests: ClientRequest[] = [];
   for (let i = 0; i < count; i++) {
+    const client = clients[i % clients.length];
     requests.push({
       createdAt: Date.now() - i * 1000,
       amount: Math.floor(Math.random() * 10000),
       url: `https://www.youtube.com/watch?v=xIthgcx-axs`,
-      requesterId: clients[i % clients.length].clientId,
+      requesterId: client.clientId,
+      requesterName: client.name,
     });
   }
   // Sort by amount descending - highest paying requests first
   return requests.sort((a, b) => b.amount - a.amount);
 };
 
-const currentlyPlaying = {
+const currentlyPlaying: ClientRequest = {
   url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  title: 'Rick Astley - Never Gonna Give You Up',
   createdAt: Date.now() - 60000,
   requesterId: 'client_def456',
+  requesterName: 'Bob',
   amount: 2100,
 };
 
