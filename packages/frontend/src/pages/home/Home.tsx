@@ -5,7 +5,7 @@ import { useDemo } from '../../contexts/demoContext';
 import Navbar from '../../components/Navbar';
 import QRScannerModal from '../../components/QRScannerModal';
 import AboutModal from '../../components/AboutModal';
-import { JoinIcon, RightArrowIcon } from '@/components/Icons';
+import { JoinIcon, RightArrowIcon, GithubIcon } from '@/components/Icons';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -198,7 +198,7 @@ export default function Home() {
                     </div>
                     <div className="text-left">
                       <div className="font-medium text-fg">Try Demo</div>
-                      <div className="text-sm text-fg-muted">Explore the app with simulated activity</div>
+                      <div className="text-sm text-fg-muted">Try the app with simulated activity</div>
                     </div>
                   </div>
                   <RightArrowIcon />
@@ -336,7 +336,15 @@ export default function Home() {
           )}
 
           {/* Footer info */}
-          <p className="text-center text-fg-muted/50 text-xs mt-6">
+          <p className="text-center text-fg-muted/50 text-xs mt-6 flex items-center justify-center gap-1">
+            <a
+              href="https://github.com/landaverdend/mempool.channel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fg-muted/50 hover:text-fg-muted transition-colors">
+              <GithubIcon />
+            </a>
+            <span className="mx-1">·</span>
             Powered by Lightning Network ⚡ <span className="mx-1">·</span>
             <button
               onClick={() => setIsAboutOpen(true)}
