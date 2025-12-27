@@ -185,7 +185,7 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
 }
 
 export function closeRoom(roomCode: string, reason: 'host_closed' | 'host_disconnected' | 'all_left', ctx: HandlerContext): void {
-  const { roomManager, clientManager, invoiceManager } = ctx;
+  const { roomManager, invoiceManager } = ctx;
 
   const room = roomManager.get(roomCode);
   if (!room) return;
