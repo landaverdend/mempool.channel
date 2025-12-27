@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useWebSocket } from '@/contexts/websocketContext';
 import { useYoutubeMetadata } from '@/contexts/youtubeMetadataContext';
-import { getYouTubeVideoId } from '@/lib/yt-utils';
+import { getYouTubeVideoId, validateYouTubeVideo } from '@/lib/yt-utils';
 import { isValidUrl } from '@/lib/utils';
 import { SatsIcon } from '@/components/Icons';
 import InvoiceModal from '@/components/InvoiceModal';
@@ -17,6 +17,7 @@ export default function RequestSongCard() {
   const [error, setError] = useState<string | null>(null);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [submittedAmount, setSubmittedAmount] = useState<number | undefined>();
+  const [isValidating, setIsValidating] = useState(false);
 
   const videoId = getYouTubeVideoId(url);
   const metadata = videoId ? getMetadata(url) : null;
@@ -33,7 +34,7 @@ export default function RequestSongCard() {
     setError(null);
   }, [url, amount]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const amountNum = parseInt(amount, 10);
 
     if (!url.trim()) {
@@ -56,6 +57,17 @@ export default function RequestSongCard() {
       return;
     }
 
+    // Validate video exists before generating invoice
+    setIsValidating(true);
+    const validation = await validateYouTubeVideo(url);
+
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid video');
+      setIsValidating(false);
+      return;
+    }
+
+    setIsValidating(false);
     setSubmittedAmount(amountNum);
     setShowInvoiceModal(true);
     clearInvoice();
@@ -157,11 +169,17 @@ export default function RequestSongCard() {
         {/* Submit Button */}
         <button
           onClick={handleSubmit}
-          disabled={!url.trim() || !amount}
+          disabled={!url.trim() || !amount || isValidating}
           className="w-full py-3 bg-mainnet text-white rounded font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
           <span className="flex items-center justify-center gap-2">
-            <SatsIcon width={18} height={18} />
-            Request Song
+            {isValidating ? (
+              'Validating...'
+            ) : (
+              <>
+                <SatsIcon width={18} height={18} />
+                Request Song
+              </>
+            )}
           </span>
         </button>
 

@@ -1,5 +1,36 @@
 import { YoutubeMetadata } from '@/contexts/youtubeMetadataContext';
 
+export type VideoValidationResult = {
+  valid: boolean;
+  error?: string;
+};
+
+// Validate that a YouTube video exists and is playable
+export async function validateYouTubeVideo(url: string): Promise<VideoValidationResult> {
+  const videoId = getYouTubeVideoId(url);
+
+  if (!videoId) {
+    return { valid: false, error: 'Invalid YouTube URL format' };
+  }
+
+  try {
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+    const response = await fetch(oembedUrl);
+
+    if (response.status === 404 || response.status === 401) {
+      return { valid: false, error: 'Video not found or is private' };
+    }
+
+    if (!response.ok) {
+      return { valid: false, error: 'Unable to verify video' };
+    }
+
+    return { valid: true };
+  } catch {
+    return { valid: false, error: 'Failed to validate video. Please check your connection.' };
+  }
+}
+
 // Extract YouTube video ID from various URL formats
 export function getYouTubeVideoId(url: string): string | null {
   const patterns = [
