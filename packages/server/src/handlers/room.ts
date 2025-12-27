@@ -4,6 +4,7 @@ import {
   LeaveRoomPayload,
   CloseRoomPayload,
   RoomMessagePayload,
+  HostRejoinPayload,
   normalizeRoomCode,
   isValidRoomCode,
   createMessage,
@@ -41,9 +42,12 @@ export const handleCreateRoom: Handler<CreateRoomPayload> = async (ws, payload, 
 
   console.log(`Room created: ${room.code} by ${ws.clientId}`);
 
-  // Send confirmation to host
+  // Send confirmation to host with hostToken for reconnection
   const clientInfo = roomManager.buildClientInfo(room.code, ws.clientId, clientManager);
-  ctx.sendMessage(ws, 'room-created', clientInfo);
+  ctx.sendMessage(ws, 'room-created', {
+    ...clientInfo,
+    hostToken: room.hostToken,
+  });
 };
 
 export const handleJoinRoom: Handler<JoinRoomPayload> = (ws, payload, ctx) => {
@@ -96,7 +100,8 @@ export const handleLeaveRoom: Handler<LeaveRoomPayload> = (ws, payload, ctx) => 
     return;
   }
 
-  removeClientFromRoom(ws.clientId, roomCode, ctx);
+  // Explicit leave - if host leaves explicitly, close room immediately
+  removeClientFromRoom(ws.clientId, roomCode, ctx, true);
 };
 
 export const handleCloseRoom: Handler<CloseRoomPayload> = (ws, payload, ctx) => {
@@ -113,7 +118,50 @@ export const handleCloseRoom: Handler<CloseRoomPayload> = (ws, payload, ctx) => 
     return;
   }
 
+  // Explicit close - delete immediately
   closeRoom(roomCode, 'host_closed', ctx);
+};
+
+export const handleHostRejoin: Handler<HostRejoinPayload> = (ws, payload, ctx) => {
+  const { roomManager, clientManager } = ctx;
+  const roomCode = normalizeRoomCode(payload.roomCode || '');
+
+  // Check if room exists
+  if (!roomManager.exists(roomCode)) {
+    ctx.sendError(ws, 'room_not_found', 'Room not found or expired.', roomCode);
+    return;
+  }
+
+  // Validate host token
+  if (!roomManager.validateHostToken(roomCode, payload.hostToken)) {
+    ctx.sendError(ws, 'not_host', 'Invalid host token.', roomCode);
+    return;
+  }
+
+  // Check if client is already in a different room
+  const currentRoom = clientManager.getRoom(ws.clientId);
+  if (currentRoom && currentRoom !== roomCode) {
+    ctx.sendError(ws, 'already_in_room', 'You are already in a different room.', roomCode);
+    return;
+  }
+
+  // Cancel grace period and restore host
+  roomManager.cancelGracePeriod(roomCode);
+  roomManager.rejoinAsHost(roomCode, ws.clientId);
+  clientManager.setRoom(ws.clientId, roomCode);
+  clientManager.setName(ws.clientId, payload.name);
+
+  console.log(`Host rejoined room ${roomCode} as ${ws.clientId}`);
+
+  // Send confirmation to host with updated room state (include hostToken again)
+  const clientInfo = roomManager.buildClientInfo(roomCode, ws.clientId, clientManager);
+  ctx.sendMessage(ws, 'room-created', {
+    ...clientInfo,
+    hostToken: roomManager.getHostToken(roomCode),
+  });
+
+  // Notify other members that host is back
+  ctx.broadcastToRoom(roomCode, createMessage('host-rejoined', { roomCode }), ws.clientId);
 };
 
 export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx) => {
@@ -145,8 +193,8 @@ export const handleRoomMessage: Handler<RoomMessagePayload> = (ws, payload, ctx)
 };
 
 // Helper functions for room management
-export function removeClientFromRoom(clientId: string, roomCode: string, ctx: HandlerContext): void {
-  const { roomManager, clientManager, invoiceManager } = ctx;
+export function removeClientFromRoom(clientId: string, roomCode: string, ctx: HandlerContext, isExplicitLeave = false): void {
+  const { roomManager, clientManager } = ctx;
 
   const room = roomManager.get(roomCode);
   if (!room) return;
@@ -166,9 +214,24 @@ export function removeClientFromRoom(clientId: string, roomCode: string, ctx: Ha
 
   console.log(`Client ${clientId} left room ${roomCode}`);
 
-  // Check if host left - close the room
+  // Check if host left
   if (room.hostId === clientId) {
-    closeRoom(roomCode, 'host_disconnected', ctx);
+    // If host explicitly left (not disconnect), close immediately
+    if (isExplicitLeave) {
+      closeRoom(roomCode, 'host_closed', ctx);
+      return;
+    }
+
+    // Start grace period for host reconnection
+    console.log(`Host disconnected from room ${roomCode}, starting grace period`);
+
+    // Notify remaining members that host is away
+    ctx.broadcastToRoom(roomCode, createMessage('host-away', { roomCode }));
+
+    roomManager.startGracePeriod(roomCode, () => {
+      // Grace period expired - close the room
+      closeRoom(roomCode, 'host_disconnected', ctx);
+    });
     return;
   }
 

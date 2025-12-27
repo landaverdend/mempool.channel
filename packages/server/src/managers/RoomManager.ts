@@ -1,9 +1,12 @@
 import { NWCClient } from '@getalby/sdk';
 import { ClientRequest, ClientRoomInfo, Client } from '@mempool/shared';
 import { Room, PendingInvoice } from '../types.js';
-import { generateRoomCode } from '@mempool/shared';
+import { generateRoomCode, generateId } from '@mempool/shared';
 import { insertSortedDescending } from '../utils.js';
 import { ClientManager } from './ClientManager.js';
+
+const GRACE_PERIOD_MS = 5 * 60 * 1000; // 5 minutes
+// const GRACE_PERIOD_MS = 10 * 1000;
 
 export type RoomCloseReason = 'host_closed' | 'host_disconnected' | 'all_left';
 
@@ -19,6 +22,7 @@ export class RoomManager {
     const room: Room = {
       code: roomCode,
       hostId,
+      hostToken: generateId() + generateId(), // Longer token for security
       members: [hostId],
       createdAt: Date.now(),
       currentlyPlaying: null,
@@ -26,6 +30,7 @@ export class RoomManager {
       pendingInvoices: [],
       playedRequests: [],
       nwcClient,
+      hostDisconnected: false,
     };
 
     this.rooms.set(roomCode, room);
@@ -44,6 +49,11 @@ export class RoomManager {
     const room = this.rooms.get(roomCode);
     if (!room) return false;
 
+    // Clean up grace period timeout if exists
+    if (room.gracePeriodTimeout) {
+      clearTimeout(room.gracePeriodTimeout);
+    }
+
     // Clean up resources
     if (room.pollInterval) {
       clearInterval(room.pollInterval);
@@ -57,6 +67,63 @@ export class RoomManager {
 
     this.rooms.delete(roomCode);
     return true;
+  }
+
+  // Grace period management for host reconnection
+  startGracePeriod(roomCode: string, onExpire: () => void): boolean {
+    const room = this.rooms.get(roomCode);
+    if (!room) return false;
+
+    room.hostDisconnected = true;
+    room.gracePeriodTimeout = setTimeout(() => {
+      console.log(`Grace period expired for room ${roomCode}`);
+      onExpire();
+    }, GRACE_PERIOD_MS);
+
+    console.log(`Grace period started for room ${roomCode} (${GRACE_PERIOD_MS / 1000}s)`);
+    return true;
+  }
+
+  cancelGracePeriod(roomCode: string): boolean {
+    const room = this.rooms.get(roomCode);
+    if (!room) return false;
+
+    if (room.gracePeriodTimeout) {
+      clearTimeout(room.gracePeriodTimeout);
+      room.gracePeriodTimeout = undefined;
+    }
+    room.hostDisconnected = false;
+    return true;
+  }
+
+  // Host rejoin - update hostId to new client
+  rejoinAsHost(roomCode: string, newHostId: string): boolean {
+    const room = this.rooms.get(roomCode);
+    if (!room) return false;
+
+    room.hostId = newHostId;
+    room.hostDisconnected = false;
+
+    // Add new host to members if not already there
+    if (!room.members.includes(newHostId)) {
+      room.members.push(newHostId);
+    }
+
+    return true;
+  }
+
+  validateHostToken(roomCode: string, token: string): boolean {
+    const room = this.rooms.get(roomCode);
+    return room?.hostToken === token;
+  }
+
+  isHostDisconnected(roomCode: string): boolean {
+    const room = this.rooms.get(roomCode);
+    return room?.hostDisconnected ?? false;
+  }
+
+  getHostToken(roomCode: string): string | undefined {
+    return this.rooms.get(roomCode)?.hostToken;
   }
 
   addMember(roomCode: string, clientId: string): boolean {
@@ -97,7 +164,7 @@ export class RoomManager {
       room.currentlyPlaying = request;
       return true;
     }
-    
+
     insertSortedDescending(room.requestQueue, request);
     return true;
   }

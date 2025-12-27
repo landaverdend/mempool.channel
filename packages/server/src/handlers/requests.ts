@@ -79,6 +79,7 @@ export const handleHostRequest: Handler<MakeRequestPayload> = (ws, payload, ctx)
     url: payload.url,
     requesterId: ws.clientId,
     isHostRequest: true,
+    requesterName: ctx.clientManager.getName(ws.clientId) || '',
   };
 
   // If nothing is currently playing, set the new request as the currently playing item. Don't add to queue

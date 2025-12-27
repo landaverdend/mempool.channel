@@ -101,7 +101,7 @@ const RequestItem = forwardRef<HTMLDivElement, RequestItemProps>(({ request, typ
         {index + 1}
       </span>
       <RequestBlock request={request} type={type} index={index} />
-      <span className="text-xs sm:text-lg font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterId}</span>
+      <span className="text-xs sm:text-lg font-bold truncate max-w-[100px] sm:max-w-none">{request.requesterName}</span>
     </div>
   );
 });

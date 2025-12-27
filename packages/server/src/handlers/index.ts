@@ -1,5 +1,5 @@
 import type { Handler } from './types.js';
-import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleRoomMessage } from './room.js';
+import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleRoomMessage, handleHostRejoin } from './room.js';
 import { handlePlayNext } from './playback.js';
 import { handleMakeRequest, handleHostRequest } from './requests.js';
 
@@ -13,6 +13,7 @@ export const handlers: Record<string, Handler> = {
   'play-next': handlePlayNext,
   'make-request': handleMakeRequest,
   'host-request': handleHostRequest,
+  'host-rejoin': handleHostRejoin,
 };
 
 export type { Handler, HandlerContext } from './types.js';

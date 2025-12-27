@@ -66,6 +66,7 @@ export class InvoiceManager {
             amount: pending.amount,
             url: pending.requesterUrl,
             requesterId: pending.requesterId,
+            requesterName: this.clientManager.getName(pending.requesterId) || '',
           });
 
           // Broadcast the updated room info

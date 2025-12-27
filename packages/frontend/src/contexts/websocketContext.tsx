@@ -15,8 +15,39 @@ import {
   InvoiceGeneratedPayload,
   ClientRoomInfo,
   JoinRoomPayload,
+  RoomCreatedPayload,
+  HostAwayPayload,
 } from '@mempool/shared';
 import { MOCK_ROOM_STATE, MOCK_ROOM_MESSAGES } from '@/lib/mock-data';
+
+// LocalStorage keys for host session recovery
+const HOST_TOKEN_KEY = 'mempool_host_token';
+const HOST_ROOM_CODE_KEY = 'mempool_host_room_code';
+const HOST_NAME_KEY = 'mempool_host_name';
+
+// Helper functions for host session storage
+function saveHostSession(roomCode: string, hostToken: string, name: string) {
+  localStorage.setItem(HOST_TOKEN_KEY, hostToken);
+  localStorage.setItem(HOST_ROOM_CODE_KEY, roomCode);
+  localStorage.setItem(HOST_NAME_KEY, name);
+}
+
+function clearHostSession() {
+  localStorage.removeItem(HOST_TOKEN_KEY);
+  localStorage.removeItem(HOST_ROOM_CODE_KEY);
+  localStorage.removeItem(HOST_NAME_KEY);
+}
+
+function getHostSession(): { roomCode: string; hostToken: string; name: string } | null {
+  const hostToken = localStorage.getItem(HOST_TOKEN_KEY);
+  const roomCode = localStorage.getItem(HOST_ROOM_CODE_KEY);
+  const name = localStorage.getItem(HOST_NAME_KEY);
+
+  if (hostToken && roomCode && name) {
+    return { roomCode, hostToken, name };
+  }
+  return null;
+}
 
 // Dev mode: enable with ?dev query param or VITE_DEV_MODE env var
 const isDevMode = () => {
@@ -60,6 +91,7 @@ interface WebSocketContextValue {
   // Room state
   roomState: ClientRoomInfo;
   roomMessages: RoomMessage[];
+  hostAway: boolean; // True when host is disconnected but room is in grace period
 
   // Invoice state
   invoiceState: InvoiceState;
@@ -105,9 +137,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     loading: false,
     paid: false,
   });
+  const [hostAway, setHostAway] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const clientIdRef = useRef<string | null>(null);
+  const pendingRejoinRef = useRef<boolean>(false);
 
   // Log dev mode status
   useEffect(() => {
@@ -136,13 +170,29 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         break;
       }
 
-      case 'room-created':
-      case 'room-joined': {
-        const payload = message.payload as ClientRoomInfo;
-        console.log('room-created or room-joined payload: ', payload);
+      case 'room-created': {
+        const payload = message.payload as RoomCreatedPayload;
+        console.log('room-created payload: ', payload);
         setRoomState({ ...payload });
         setRoomMessages([]);
         setError(null);
+        setHostAway(false);
+
+        // Save host session for reconnection (if we're the host)
+        if (payload.isHost && payload.hostToken) {
+          const hostName = localStorage.getItem(HOST_NAME_KEY) || 'Host';
+          saveHostSession(payload.roomCode, payload.hostToken, hostName);
+        }
+        break;
+      }
+
+      case 'room-joined': {
+        const payload = message.payload as ClientRoomInfo;
+        console.log('room-joined payload: ', payload);
+        setRoomState({ ...payload });
+        setRoomMessages([]);
+        setError(null);
+        setHostAway(false);
         break;
       }
 
@@ -156,8 +206,25 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         const payload = message.payload as RoomClosedPayload;
         setRoomState(EMPTY_ROOM_STATE);
         setRoomMessages([]);
+        setHostAway(false);
+        clearHostSession();
         const reasonText = payload.reason.replace(/_/g, ' ');
         setError(`Room closed: ${reasonText}`);
+        break;
+      }
+
+      case 'host-away': {
+        const payload = message.payload as HostAwayPayload;
+        console.log('Host is away from room:', payload.roomCode);
+        setHostAway(true);
+        toast.info('Host disconnected. Waiting for reconnection...');
+        break;
+      }
+
+      case 'host-rejoined': {
+        console.log('Host has rejoined the room');
+        setHostAway(false);
+        toast.success('Host has reconnected!');
         break;
       }
 
@@ -198,6 +265,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       case 'room-error': {
         const payload = message.payload as RoomErrorPayload;
         setError(payload.message);
+        // If we get a room error (e.g., room not found during rejoin), clear the saved session
+        if (payload.error === 'room_not_found' || payload.error === 'not_host') {
+          clearHostSession();
+        }
         break;
       }
 
@@ -248,6 +319,24 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     socket.onopen = () => {
       setConnected(true);
       console.log('Connected to server');
+
+      // Check for saved host session and attempt rejoin
+      const hostSession = getHostSession();
+      if (hostSession && !pendingRejoinRef.current) {
+        pendingRejoinRef.current = true;
+        console.log('Attempting to rejoin as host:', hostSession.roomCode);
+
+        // Small delay to ensure clientId is set
+        setTimeout(() => {
+          const rejoinMessage = createMessage('host-rejoin', {
+            roomCode: hostSession.roomCode,
+            hostToken: hostSession.hostToken,
+            name: hostSession.name,
+          });
+          socket.send(serializeMessage(rejoinMessage));
+          pendingRejoinRef.current = false;
+        }, 100);
+      }
     };
 
     socket.onmessage = handleMessage;
@@ -267,7 +356,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     };
 
     wsRef.current = socket;
-  }, [devMode]);
+  }, [devMode, handleMessage]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -301,6 +390,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const createRoom = useCallback(
     (createRoomPayload: CreateRoomPayload) => {
+      // Save name for host session recovery
+      localStorage.setItem(HOST_NAME_KEY, createRoomPayload.name);
       sendMessage('create-room', createRoomPayload);
     },
     [sendMessage]
@@ -321,6 +412,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   const closeRoom = useCallback(() => {
     if (roomState.roomCode && roomState.isHost) {
+      // Clear host session before closing (explicit close)
+      clearHostSession();
       sendMessage('close-room', { roomCode: roomState.roomCode });
     }
   }, [sendMessage, roomState.roomCode, roomState.isHost]);
@@ -390,6 +483,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     error,
     roomState,
     roomMessages,
+    hostAway,
     invoiceState,
     connect,
     disconnect,

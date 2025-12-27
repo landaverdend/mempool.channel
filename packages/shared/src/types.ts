@@ -31,6 +31,11 @@ export type MessageType =
   | 'now-playing'
   | 'host-request' // Debug / Host only
 
+  // Host reconnection
+  | 'host-rejoin'
+  | 'host-rejoined'
+  | 'host-away' // Notify members host disconnected but room still alive
+
   // Room response types
   | 'room-created'
   | 'room-joined'
@@ -81,6 +86,7 @@ export interface Client {
 
 // Client request info sent to clients (subset of server Request)
 export interface ClientRequest {
+  requesterName: string;
   createdAt: number;
   amount: number;
   url: string;
@@ -183,4 +189,23 @@ export interface InvoicePaidPayload {
 export interface NowPlayingPayload {
   roomCode: string;
   nowPlaying: ClientRequest | null;
+}
+
+// Host reconnection payloads
+export interface HostRejoinPayload {
+  roomCode: string;
+  hostToken: string;
+  name: string;
+}
+
+export interface RoomCreatedPayload extends ClientRoomInfo {
+  hostToken: string; // Token for host to rejoin after disconnect
+}
+
+export interface HostAwayPayload {
+  roomCode: string;
+}
+
+export interface HostRejoinedPayload {
+  roomCode: string;
 }

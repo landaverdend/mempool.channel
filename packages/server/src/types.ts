@@ -16,6 +16,7 @@ export interface PendingInvoice {
 export interface Room {
   code: string;
   hostId: string;
+  hostToken: string; // Token for host to rejoin after disconnect
   members: string[];
   createdAt: number;
 
@@ -29,4 +30,8 @@ export interface Room {
   nwcClient: NWCClient;
   // Interval for polling invoice status
   pollInterval?: ReturnType<typeof setInterval>;
+
+  // Grace period for host reconnection
+  hostDisconnected: boolean;
+  gracePeriodTimeout?: ReturnType<typeof setTimeout>;
 }
