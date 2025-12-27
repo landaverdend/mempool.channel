@@ -49,8 +49,8 @@ export function RequestQueue({ roomState }: RequestQueueProps) {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`w-full overflow-x-auto scrollbar-none px-4 sm:px-6 md:px-10 py-4 select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
-      <div className="flex flex-row gap-3 sm:gap-4 justify-center">
+      className={`w-full overflow-x-auto scrollbar-none py-4 select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
+      <div className="flex flex-row gap-3 sm:gap-4 w-fit mx-auto px-4 sm:px-6 md:px-10">
         {isEmpty && <div className="text-fg-muted text-3xl sm:text-4xl font-bold mt-4">No requests in queue</div>}
 
         {playedRequests.map((request, i) => (
