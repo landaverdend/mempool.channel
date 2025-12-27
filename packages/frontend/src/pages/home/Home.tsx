@@ -122,8 +122,8 @@ export default function Home() {
                   onClick={() => setMode('create')}
                   className="w-full flex items-center justify-between p-4 bg-bg-stat hover:bg-secondary/50 rounded-lg transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-700/40 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
                     </div>
@@ -214,10 +214,14 @@ export default function Home() {
                       onClick={() => setIsScannerOpen(true)}
                       disabled={isLoading}
                       className="px-4 py-3 bg-bg-input border border-border rounded-lg text-fg-muted hover:text-fg hover:border-primary transition-colors disabled:opacity-50 cursor-pointer"
-                      title="Scan QR Code"
-                    >
+                      title="Scan QR Code">
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -302,11 +306,7 @@ export default function Home() {
       </main>
 
       {/* QR Scanner Modal */}
-      <QRScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScan={(result) => setNwcUrl(result)}
-      />
+      <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScan={(result) => setNwcUrl(result)} />
     </div>
   );
 }
