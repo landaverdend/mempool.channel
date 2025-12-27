@@ -106,7 +106,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <h4 className="text-sm font-semibold text-fg uppercase tracking-wide">Links</h4>
             <div className="flex flex-wrap gap-2">
               <a
-                href="https://github.com/landaverdend/mempool.music"
+                href="https://github.com/landaverdend/mempool.channel"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-2 bg-bg-stat hover:bg-secondary/50 rounded-lg transition-colors text-sm text-fg-muted hover:text-fg">
