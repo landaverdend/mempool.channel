@@ -10,8 +10,6 @@ const DEMO_CLIENT_ID = 'demo_host_123';
 const DEMO_VIDEOS = [
   { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
   { url: 'https://www.youtube.com/watch?v=DsC8jQXRbQE' },
-  { url: 'https://www.youtube.com/watch?v=hE66C4cUJJY' },
-  { url: 'https://www.youtube.com/watch?v=an1IV6Oyvuc' },
   { url: 'https://www.youtube.com/watch?v=t-5H-mMXH_4' },
   { url: 'https://www.youtube.com/watch?v=kAjLAyVyWvg' },
 ];
