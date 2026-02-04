@@ -52,20 +52,6 @@ function createInitialDemoState(): ClientRoomInfo {
       requesterName: 'Alice',
       amount: 2100,
     },
-    {
-      url: 'https://www.youtube.com/watch?v=hE66C4cUJJY',
-      createdAt: Date.now() - 20000,
-      requesterId: 'demo_user_2',
-      requesterName: 'Bob',
-      amount: 1500,
-    },
-    {
-      url: 'https://www.youtube.com/watch?v=an1IV6Oyvuc',
-      createdAt: Date.now() - 10000,
-      requesterId: 'demo_user_3',
-      requesterName: 'Charlie',
-      amount: 800,
-    },
   ].sort((a, b) => b.amount - a.amount);
 
   return {
